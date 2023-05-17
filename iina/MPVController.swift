@@ -402,13 +402,13 @@ class MPVController: NSObject {
     // sub-visibility, but the option secondary-sub-visibility is missing. This inconsistency is
     // likely to confuse users, so insure the visibility setting for secondary subtitles is also
     // saved in watch later files.
-    if  let watchLaterOptions = getString(MPVOption.ProgramBehavior.watchLaterOptions),
+    if  let watchLaterOptions = getString(MPVOption.WatchLater.watchLaterOptions),
         watchLaterOptions.contains(MPVOption.Subtitles.subVisibility),
         !watchLaterOptions.contains(MPVOption.Subtitles.secondarySubVisibility) {
-      setString(MPVOption.ProgramBehavior.watchLaterOptions, watchLaterOptions + "," +
+      setString(MPVOption.WatchLater.watchLaterOptions, watchLaterOptions + "," +
                 MPVOption.Subtitles.secondarySubVisibility)
     }
-    if let watchLaterOptions = getString(MPVOption.ProgramBehavior.watchLaterOptions) {
+    if let watchLaterOptions = getString(MPVOption.WatchLater.watchLaterOptions) {
       Logger.log("Options mpv is configured to save in watch later files: \(watchLaterOptions)")
     }
 
@@ -1132,17 +1132,15 @@ class MPVController: NSObject {
 
     case MPVOption.Subtitles.subVisibility:
       if let visible = UnsafePointer<Bool>(OpaquePointer(property.data))?.pointee {
-        if player.info.isSubVisible != visible {
-          player.info.isSubVisible = visible
-          player.sendOSD(visible ? .subVisible : .subHidden)
+        DispatchQueue.main.async {
+          self.player.subVisibilityChanged(visible)
         }
       }
 
     case MPVOption.Subtitles.secondarySubVisibility:
       if let visible = UnsafePointer<Bool>(OpaquePointer(property.data))?.pointee {
-        if player.info.isSecondSubVisible != visible {
-          player.info.isSecondSubVisible = visible
-          player.sendOSD(visible ? .secondSubVisible : .secondSubHidden)
+        DispatchQueue.main.async {
+          self.player.secondSubVisibilityChanged(visible)
         }
       }
 

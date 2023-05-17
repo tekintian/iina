@@ -136,4 +136,6 @@ extension Notification.Name {
   static let iinaPlayerStopped = Notification.Name("iinaPlayerStopped")
   static let iinaPlayerShutdown = Notification.Name("iinaPlayerShutdown")
   static let iinaPlaySliderLoopKnobChanged = Notification.Name("iinaPlaySliderLoopKnobChanged")
+  static let iinaSecondSubVisibilityChanged = Notification.Name("iinaSecondSubVisibilityChanged")
+  static let iinaSubVisibilityChanged = Notification.Name("iinaSubVisibilityChanged")
 }
