@@ -292,7 +292,9 @@ struct Preference {
     /** Alerts */
     static let suppressCannotPreventDisplaySleep = Key("suppressCannotPreventDisplaySleep")
 
+    /** Internal */
     static let iinaEnablePluginSystem = Key("iinaEnablePluginSystem")
+    static let enableFFmpegImageDecoder = Key("enableFFmpegImageDecoder")
   }
 
   // MARK: - Enums
@@ -865,7 +867,9 @@ struct Preference {
     .savedVideoFilters: [SavedFilter](),
     .savedAudioFilters: [SavedFilter](),
 
-    .suppressCannotPreventDisplaySleep: false
+    .suppressCannotPreventDisplaySleep: false,
+
+    .enableFFmpegImageDecoder: true
   ]
 
 
