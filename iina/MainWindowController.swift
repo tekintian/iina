@@ -2308,6 +2308,9 @@ class MainWindowController: PlayerWindowController {
     if percentage < 0 {
       percentage = 0
     }
+    if playSlider.userInterfaceLayoutDirection == .rightToLeft {
+      percentage = 1.0 - percentage
+    }
 
     if let duration = player.info.videoDuration {
       let previewTime = duration * percentage

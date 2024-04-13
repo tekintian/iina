@@ -68,7 +68,10 @@ final class PlaySliderLoopKnob: NSView {
       let bar = cell.barRect(flipped: isFlipped)
       // The usable width of the bar is reduced by the width of the knob.
       let effectiveWidth = bar.width - cell.knobWidth
-      let percentage = CGFloat(doubleValue / slider.span)
+      var percentage = CGFloat(doubleValue / slider.span)
+      if userInterfaceLayoutDirection == .rightToLeft {
+        percentage = 1.0 - percentage
+      }
       let calculatedX = constrainX(bar.origin.x + percentage * effectiveWidth)
       setFrameOrigin(NSPoint(x: calculatedX, y: frame.origin.y))
       return calculatedX
