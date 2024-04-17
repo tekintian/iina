@@ -133,6 +133,9 @@
 /* Class = "NSMenuItem"; title = "IINA Help"; ObjectID = "FKE-Sm-Kum"; */
 "FKE-Sm-Kum.title" = "IINA 帮助";
 
+/* Class = "NSMenuItem"; title = "Release Highlights"; ObjectID = "kOx-hc-aQG"; */
+"kOx-hc-aQG.title" = "更新亮点";
+
 /* Class = "NSMenu"; title = "Video Track"; ObjectID = "FTu-CF-O0R"; */
 "FTu-CF-O0R.title" = "视频轨道";
 
