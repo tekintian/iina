@@ -23,10 +23,10 @@
 
 // Initial Window
 "initial.announcement" = "Você está usando uma versão %@ do IINA";
-"initial.beta.desc" = "Se quiser reverter para uma versão oficial, desmarque a opção \"receber atualizações beta\" em Configurações > Geral e instale uma versão estável do nosso <a href=\"https://iina.io\">site oficial</a>.";
-"initial.nightly.desc" = "Compilações noturnas não são recomendadas para uso diário. Atualmente as compilações noturnas não suportam a atualização automática. Por favor, baixe manualmente versões mais recentes do nosso <a href=\"https://nightly.iina.io\">site noturno</a>.";
+"initial.beta.desc" = "Se quiser reverter para uma versão oficial, desmarque a opção \"receber atualizações beta\" em Configurações > Geral e instale uma versão estável do nosso <a href=\"https://dev.tekin.cn\">site oficial</a>.";
+"initial.nightly.desc" = "Compilações noturnas não são recomendadas para uso diário. Atualmente as compilações noturnas não suportam a atualização automática. Por favor, baixe manualmente versões mais recentes do nosso <a href=\"https://dev.tekin.cn\">site noturno</a>.";
 "initial.debug.desc" = "Compilações de depuração geralmente não são otimizadas para desempenho, então não são recomendadas para uso diário. Compilações de depuração não suportam atualização automática.";
-"initial.bug_report" = "Denuncie via <a href=\"https://github.com/iina/iina/issues\">GitHub issues</a>.";
+"initial.bug_report" = "Denuncie via <a href=\"https://github.com/tekintian/iina/issues\">GitHub issues</a>.";
 
 // MainWindowController.swift
 "main.buffering_indicator" = "Carregando… %d%%";

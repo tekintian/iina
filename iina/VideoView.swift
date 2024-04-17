@@ -208,7 +208,7 @@ class VideoView: NSView {
   ///
   /// If a display link has already been created then that link will be returned, otherwise a display link will be created and returned.
   ///
-  /// - Note: Issue [#4520](https://github.com/iina/iina/issues/4520) reports a case where it appears the call to
+  /// - Note: Issue [#4520](https://github.com/tekintian/iina/issues/4520) reports a case where it appears the call to
   ///[CVDisplayLinkCreateWithActiveCGDisplays](https://developer.apple.com/documentation/corevideo/1456863-cvdisplaylinkcreatewithactivecgd) is failing. In case that failure is
   ///encountered again this method is careful to log any failure and include the [result code](https://developer.apple.com/documentation/corevideo/1572713-result_codes) in the alert displayed
   /// by `Logger.fatal`.
@@ -357,7 +357,7 @@ class VideoView: NSView {
   /// If the result code is not [kCVReturnSuccess](https://developer.apple.com/documentation/corevideo/kcvreturnsuccess)
   /// then a warning message will be logged. Failures are only logged because previously the result was not checked. We want to see if
   /// calls have been failing before taking any action other than logging.
-  /// - Note: Error checking was added in response to issue [#4520](https://github.com/iina/iina/issues/4520)
+  /// - Note: Error checking was added in response to issue [#4520](https://github.com/tekintian/iina/issues/4520)
   ///         where a core video method unexpectedly failed.
   /// - Parameters:
   ///   - result: The [CVReturn](https://developer.apple.com/documentation/corevideo/cvreturn)
@@ -447,7 +447,7 @@ extension VideoView {
       Logger.log("HDR primaries and gamma not available", level: .debug, subsystem: hdrSubsystem)
       return false
     }
-  
+
     let peak = mpv.getDouble(MPVProperty.videoParamsSigPeak)
     Logger.log("HDR gamma=\(gamma), primaries=\(primaries), sig_peak=\(peak)", level: .debug, subsystem: hdrSubsystem)
 

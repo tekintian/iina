@@ -23,10 +23,10 @@
 
 // Initial Window
 "initial.announcement" = "Používate %@ beta verziu aplikácie IINA";
-"initial.beta.desc" = "Odškrtnite \"Sťahovať beta aktualizácie\" v Nastavenia - Všeobecné a nainštalujte stabilnú verziu z našej <a href=\"https://iina.io\">oficiálnej stránky</a>.";
-"initial.nightly.desc" = "Nočné zostavenia nie sú odporúčané pre každodenné použitie. V súčasnej dobe nepodporujú automatické aktualizácie. Stiahnite si ručne novšie zostavenie z našej <a href=\"https://nightly.iina.io\">nočnej webovej stránky</a>.";
+"initial.beta.desc" = "Odškrtnite \"Sťahovať beta aktualizácie\" v Nastavenia - Všeobecné a nainštalujte stabilnú verziu z našej <a href=\"https://dev.tekin.cn\">oficiálnej stránky</a>.";
+"initial.nightly.desc" = "Nočné zostavenia nie sú odporúčané pre každodenné použitie. V súčasnej dobe nepodporujú automatické aktualizácie. Stiahnite si ručne novšie zostavenie z našej <a href=\"https://dev.tekin.cn\">nočnej webovej stránky</a>.";
 "initial.debug.desc" = "Ladiace zostavenie obvykle nie sú optimalizované pre výkon, nie sú teda odporúčané pre každodenné použitie. Ladiaci zostavenie nepodporujú automatické aktualizácie.";
-"initial.bug_report" = "Nahláste na <a href=\"https://github.com/iina/iina/issues\">GitHub</a>.";
+"initial.bug_report" = "Nahláste na <a href=\"https://github.com/tekintian/iina/issues\">GitHub</a>.";
 
 // MainWindowController.swift
 "main.buffering_indicator" = "Načítava sa… %d%%";

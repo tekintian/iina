@@ -9,7 +9,7 @@
 import Cocoa
 import WebKit
 
-fileprivate let highlightsLink = "https://iina.io/highlights"
+fileprivate let highlightsLink = "https://api.tekin.cn/iina/highlights"
 
 class GuideWindowController: NSWindowController {
   override var windowNibName: NSNib.Name {
@@ -63,7 +63,7 @@ class GuideWindowController: NSWindowController {
 extension GuideWindowController: WKNavigationDelegate {
   func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
     if let url = navigationAction.request.url {
-      if url.absoluteString.starts(with: "https://iina.io/highlights/") {
+      if url.absoluteString.starts(with: "https://api.tekin.cn/iina/highlights/") {
         decisionHandler(.allow)
         return
       } else {

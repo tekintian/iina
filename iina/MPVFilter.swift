@@ -202,7 +202,7 @@ class MPVFilter: NSObject {
   /// using the string representation, or if parsing failed.
   /// - Note:
   /// Related issues:
-  /// * [Audio filters with same name cannot be removed. #3620](https://github.com/iina/iina/issues/3620)
+  /// * [Audio filters with same name cannot be removed. #3620](https://github.com/tekintian/iina/issues/3620)
   /// * [mpv_get_property returns filter params in unordered map breaking remove #9841](https://github.com/mpv-player/mpv/issues/9841)
   /// - Parameter name: Name of the filter.
   /// - Parameter rawParamString: String to be parsed.
@@ -265,7 +265,7 @@ class MPVFilter: NSObject {
   /// `params` property if available over comparing string representations.
   /// - Note:
   /// Related issues:
-  /// * [Audio filters with same name cannot be removed. #3620](https://github.com/iina/iina/issues/3620)
+  /// * [Audio filters with same name cannot be removed. #3620](https://github.com/tekintian/iina/issues/3620)
   /// * [mpv_get_property returns filter params in unordered map breaking remove #9841](https://github.com/mpv-player/mpv/issues/9841)
   /// - Parameter object: The object to compare to this filter.
   /// - Returns: `true` if this filter is equal to the given object, otherwise `false`.

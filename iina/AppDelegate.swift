@@ -677,7 +677,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
       return
     }
     let urls = pendingFilesForOpenFile.map { URL(fileURLWithPath: $0) }
-    
+
     // if installing a plugin package
     if let pluginPackageURL = urls.first(where: { $0.pathExtension == "iinaplgz" }) {
       showPreferences(self)
@@ -756,13 +756,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
       Logger.log("Cannot parse URL using URLComponents", level: .warning)
       return
     }
-    
+
     if parsed.scheme != "iina" {
       // try to open the URL directly
       PlayerCore.activeOrNewForMenuAction(isAlternative: false).openURLString(url)
       return
     }
-    
+
     // handle url scheme
     guard let host = parsed.host else { return }
 
@@ -959,7 +959,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
   /// Empties the recent documents list for the application.
   ///
   /// This is part of a workaround for macOS Sonoma clearing the list of recent documents. See the method
-  /// `restoreRecentDocuments` and the issue [#4688](https://github.com/iina/iina/issues/4688) for more
+  /// `restoreRecentDocuments` and the issue [#4688](https://github.com/tekintian/iina/issues/4688) for more
   /// information..
   /// - Parameter sender: The object that initiated the clearing of the recent documents.
   @IBAction
@@ -971,7 +971,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
   /// Adds or replaces an Open Recent menu item corresponding to the data located by the URL.
   ///
   /// This is part of a workaround for macOS Sonoma clearing the list of recent documents. See the method
-  /// `restoreRecentDocuments` and the issue [#4688](https://github.com/iina/iina/issues/4688) for more
+  /// `restoreRecentDocuments` and the issue [#4688](https://github.com/tekintian/iina/issues/4688) for more
   /// information..
   /// - Parameter url: The URL to evaluate.
   func noteNewRecentDocumentURL(_ url: URL) {
@@ -983,7 +983,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
   ///
   /// For macOS Sonoma `sharedfilelistd` was changed to tie the list of recent documents to the app based on its certificate.
   /// if `sharedfilelistd` determines the list is being accessed by a different app then it clears the list. See issue
-  /// [#4688](https://github.com/iina/iina/issues/4688) for details.
+  /// [#4688](https://github.com/tekintian/iina/issues/4688) for details.
   ///
   /// This new behavior does not cause a problem when the code is signed with IINA's certificate. However developer and nightly
   /// builds use an ad hoc certificate. This causes the list of recently opened files to be cleared each time a different unsigned IINA build
@@ -1029,7 +1029,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
   /// to `recentDocuments` in the IINA settings property file.
   ///
   /// This is part of a workaround for macOS Sonoma clearing the list of recent documents. See the method
-  /// `restoreRecentDocuments` and the issue [#4688](https://github.com/iina/iina/issues/4688) for more
+  /// `restoreRecentDocuments` and the issue [#4688](https://github.com/tekintian/iina/issues/4688) for more
   /// information..
   func saveRecentDocuments() {
     guard #available(macOS 14, *) else { return }

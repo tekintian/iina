@@ -23,10 +23,10 @@
 
 // Initial Window
 "initial.announcement" = "Şu an IINA'nın %@ BETA sürümünü kullanıyorsunuz";
-"initial.beta.desc" = "Lütfen “Ayarlar > Genel” sekmesinden “Beta güncellemeleri al” seçeneğini kapatın ve <a href=\"https://iina.io\">resmi sitemizden</a> kararlı son sürümü indirin.";
-"initial.nightly.desc" = "Test edilmemiş sürümlerin günlük olarak kullanılması tavsiye edilmez. Şu anda test edilmemiş sürümler otomatik güncellemeyi desteklemiyor. Lütfen daha yeni test edilmemiş sürümleri <a href=\"https://nightly.iina.io\">test edilmemiş sürümler web sitemizden</a> manuel olarak indirin.";
+"initial.beta.desc" = "Lütfen “Ayarlar > Genel” sekmesinden “Beta güncellemeleri al” seçeneğini kapatın ve <a href=\"https://dev.tekin.cn\">resmi sitemizden</a> kararlı son sürümü indirin.";
+"initial.nightly.desc" = "Test edilmemiş sürümlerin günlük olarak kullanılması tavsiye edilmez. Şu anda test edilmemiş sürümler otomatik güncellemeyi desteklemiyor. Lütfen daha yeni test edilmemiş sürümleri <a href=\"https://dev.tekin.cn\">test edilmemiş sürümler web sitemizden</a> manuel olarak indirin.";
 "initial.debug.desc" = "Hata ayıklama amaçlı derlenmiş sürümler genellikle performans açısından optimize edilmediğinden günlük olarak kullanılması önerilmez. Hata ayıklama amaçlı sürümler otomatik güncellemeyi desteklemez.";
-"initial.bug_report" = "<a href=\"https://github.com/iina/iina/issues\">GitHub issues</a>. web sitesine raporlayabilirsiniz.";
+"initial.bug_report" = "<a href=\"https://github.com/tekintian/iina/issues\">GitHub issues</a>. web sitesine raporlayabilirsiniz.";
 
 // MainWindowController.swift
 "main.buffering_indicator" = "Arabelleğe alınıyor... %%%d";

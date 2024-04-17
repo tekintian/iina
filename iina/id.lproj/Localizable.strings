@@ -23,10 +23,10 @@
 
 // Initial Window
 "initial.announcement" = "Kamu memakai IINA versi %@";
-"initial.beta.desc" = "Jika anda ingin mengembalikan ke versi rilis, hilangkan \"terima pembaruan beta\" dari Pengaturan > Umum, dan instal versi stabil dari <a href=\"https://iina.io\">situs resmi</a>.";
-"initial.nightly.desc" = "Nightly tidak disarankan untuk digunakan sebagai drive harian. Bangunan nightly saat ini tidak mendukung pembaruan otomatis. Unduh bangunan baru secara manual dari <a href=\"https://nightly.iina.io\">situs web nightly</a> kami.";
+"initial.beta.desc" = "Jika anda ingin mengembalikan ke versi rilis, hilangkan \"terima pembaruan beta\" dari Pengaturan > Umum, dan instal versi stabil dari <a href=\"https://dev.tekin.cn\">situs resmi</a>.";
+"initial.nightly.desc" = "Nightly tidak disarankan untuk digunakan sebagai drive harian. Bangunan nightly saat ini tidak mendukung pembaruan otomatis. Unduh bangunan baru secara manual dari <a href=\"https://dev.tekin.cn\">situs web nightly</a> kami.";
 "initial.debug.desc" = "Bangunan debug biasanya tidak dioptimalkan performanya, sehingga tidak disarankan untuk digunakan sebagai drive harian. Bangunan debug tidak mendukung pembaruan otomatis.";
-"initial.bug_report" = "Laporkan melalui <a href=\"https://github.com/iina/iina/issues\">Masalah GitHub</a>.";
+"initial.bug_report" = "Laporkan melalui <a href=\"https://github.com/tekintian/iina/issues\">Masalah GitHub</a>.";
 
 // MainWindowController.swift
 "main.buffering_indicator" = "Menyangga… %d%%";

@@ -17,19 +17,19 @@ func printPluginHelp() {
     Commands:
         new <name> [--url=template_url]
             Create a new IINA plugin in the current directory with specified name.
-    
+
             Options:
             --url=template_url:
                 Use template_url as the plugin template. The default template is
-                https://github.com/iina/iina-plugin-template/archive/refs/heads/master.zip.
-    
+                https://github.com/tekintian/iina-plugin-template/archive/refs/heads/master.zip.
+
         pack <dir>
             Compress a plugin folder into an .iinaplgz file.
-    
+
         link <path>
             Create a symlink to the plugin folder at <path> so IINA can load it as
             a development package.
-    
+
         unlink <path>
             Remove the plugin symlink from IINA's plugin folder.
     """)
@@ -53,7 +53,7 @@ if !handlePluginCommand(userArgs) {
 
 func handlePluginCommand(_ args: [String]) -> Bool {
   guard args.count > 1 else { return false }
-  
+
   switch args.first {
   case "new":
     return createPlugin(args.dropFirst())
@@ -83,7 +83,7 @@ func createPlugin(_ args: ArraySlice<String>) -> Bool {
   for idx in idxToBeDropped {
     args.remove(at: idx)
   }
-  
+
   // plugin name
   let name: String
   if args.isEmpty {
@@ -95,9 +95,9 @@ func createPlugin(_ args: ArraySlice<String>) -> Bool {
   } else {
     name = args.first!
   }
-  
+
   // plugin directory
-  
+
   var pluginDir = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
 #if MACOS_13_AVAILABLE
   if #available(macOS 13.0, *) {
@@ -106,22 +106,22 @@ func createPlugin(_ args: ArraySlice<String>) -> Bool {
 #else
   pluginDir.appendPathComponent(name)
 #endif
-  
+
   func printErrorAndExit(_ message: String) -> Never {
     print(message)
     try? FileManager.default.removeItem(at: pluginDir)
     exit(EXIT_FAILURE)
   }
-  
+
   if FileManager.default.fileExists(atPath: pluginDir.path) {
     print("Directory \(pluginDir.path) already exists.")
     exit(EXIT_FAILURE)
   }
-  
+
   // options
-  
+
   print("")
-  
+
   let hasGlobal = promptYesOrNo("Include a global entry?")
   let hasOverlay = promptYesOrNo("Create template for video overlay?")
   let hasSidebar = promptYesOrNo("Create template for a side bar view?")
@@ -137,7 +137,7 @@ func createPlugin(_ args: ArraySlice<String>) -> Bool {
   } else {
     print("The Parcel bundler will be used.")
   }
-  
+
   let templateData: [String: Any] = [
     "name": name,
     "hasGlobal": hasGlobal,
@@ -149,15 +149,15 @@ func createPlugin(_ args: ArraySlice<String>) -> Bool {
     "useReact": framework == "React",
     "hasUI": (hasOverlay || hasSidebar || hasWindow) && useBundler
   ]
-  
+
   print("\n----------\n")
-  
+
   // Download the template. We uploaded the file
-  // https://github.com/iina/iina-plugin-template/archive/refs/heads/master.zip
+  // https://github.com/tekintian/iina-plugin-template/archive/refs/heads/master.zip
   // to iina.io to avoid GitHub access issues in China.
   let defaultTemplateURL = "https://dl.iina.io/plugin-template/master.zip"
   let templateURL = userTemplateURL ?? defaultTemplateURL
-  
+
   // Use shell commands here for simplicity
   let tmpURL = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
     .appendingPathComponent("iina-cli")
@@ -167,10 +167,10 @@ func createPlugin(_ args: ArraySlice<String>) -> Bool {
     printErrorAndExit("Unable to create tmp directory. Error: \(error)")
   }
   print("Downloading to \(tmpURL.path)")
-  
+
   let cmd = "curl -o template.zip \(templateURL) && unzip -oq template.zip -d template"
   var (process, stdout, stderr) = Process.run(["/bin/bash", "-c", cmd], at: tmpURL)
-  
+
   guard process.terminationStatus == 0 else {
     let outText = String(data: stdout.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? "None"
     let errText = String(data: stderr.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? "None"
@@ -182,7 +182,7 @@ func createPlugin(_ args: ArraySlice<String>) -> Bool {
   guard process.terminationStatus == 0 else {
     printErrorAndExit("Unable to download the plugin template.\n\(outText)\n\(errText)")
   }
-  
+
   // if the previous command succeeded, stdout should be the folder name inside template/
   let templateDir = tmpURL.appendingPathComponent("template")
     .appendingPathComponent(outText.trimmingCharacters(in: .whitespacesAndNewlines))
@@ -197,7 +197,7 @@ func createPlugin(_ args: ArraySlice<String>) -> Bool {
   } catch {
     printErrorAndExit("Unable to create the plugin folder at \(pluginDir.path).")
   }
-  
+
   let fileListPath = url(".file-list", in: templateDir).path
   guard FileManager.default.fileExists(atPath: fileListPath) else {
     printErrorAndExit("The .file-list file doesnt exist in plugin template dir")
@@ -228,7 +228,7 @@ func createPlugin(_ args: ArraySlice<String>) -> Bool {
       printErrorAndExit("Failed to create \(file), error: \(error)")
     }
   }
-  
+
   print("Plugin directory created.")
   if useBundler {
     print("\n----------\n")
@@ -254,13 +254,13 @@ func packPlugin(_ args: ArraySlice<String>) -> Bool {
     print("Plugin directory doesn't exist.")
     exit(EXIT_FAILURE)
   }
-  
+
   let infoJsonPath = pluginDir.appendingPathComponent("Info.json").path
   guard FileManager.default.fileExists(atPath: infoJsonPath) else {
     print("Plugin directory doesn't contain Info.json.")
     exit(EXIT_FAILURE)
   }
-  
+
   let plgzFileName = pluginDir.lastPathComponent.appending(".iinaplgz")
   let packagePath = currentDirURL.appendingPathComponent(plgzFileName).path
   if FileManager.default.fileExists(atPath: packagePath) {
@@ -268,17 +268,17 @@ func packPlugin(_ args: ArraySlice<String>) -> Bool {
       exit(EXIT_SUCCESS)
     }
   }
-  
+
   let cmd = "zip -ryq \(packagePath) . -x 'node_modules/*' -x '.*'"
   let (process, stdout, stderr) = Process.run(["/bin/bash", "-c", cmd], at: pluginDir)
-  
+
   guard process.terminationStatus == 0 else {
     let outText = String(data: stdout.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? "None"
     let errText = String(data: stderr.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? "None"
     print("Unable to create the archive.\n\(outText)\n\(errText)")
     exit(EXIT_FAILURE)
   }
-  
+
   print("Created archive \(packagePath)")
   return true
 }
@@ -304,7 +304,7 @@ func linkPlugin(_ args: ArraySlice<String>) -> Bool {
     print("Unable to create the symlink, error: \(error)")
     exit(EXIT_FAILURE)
   }
-  
+
   print("Created symlink \(dstName) under \(appSupportDir.path)")
   return true
 }

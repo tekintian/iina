@@ -623,7 +623,7 @@ class PlayerCore: NSObject {
         miniPlayer.togglePlaylist(self)
       }
     }
-    
+
     events.emit(.musicModeChanged, data: true)
   }
 
@@ -662,7 +662,7 @@ class PlayerCore: NSObject {
     mainWindow.videoView.videoLayer.draw(forced: true)
 
     mainWindow.updateTitle()
-    
+
     events.emit(.musicModeChanged, data: false)
   }
 
@@ -681,7 +681,7 @@ class PlayerCore: NSObject {
   ///     response the event handler in `MPVController` will call `VideoView.displayIdle`. The suspicion is that calling this
   ///     method results in a call to `CVDisplayLinkCreateWithActiveCGDisplays` which fails because the display is
   ///     asleep. Thus `setFlag` **must not** be called if the `mpv` core is idle or stopping. See issue
-  ///     [#4520](https://github.com/iina/iina/issues/4520)
+  ///     [#4520](https://github.com/tekintian/iina/issues/4520)
   func pause() {
     guard !info.isIdle, !isStopping, !isStopped, !isShuttingDown, !isShutdown else { return }
     mpv.setFlag(MPVOption.PlaybackControl.pause, true)
@@ -1040,7 +1040,7 @@ class PlayerCore: NSObject {
     }
     mpv.command(.set, args: [optionName, value.description])
   }
-  
+
   func loadExternalVideoFile(_ url: URL) {
     mpv.command(.videoAdd, args: [url.path], checkError: false) { code in
       if code < 0 {

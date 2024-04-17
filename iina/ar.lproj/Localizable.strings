@@ -23,10 +23,10 @@
 
 // Initial Window
 "initial.announcement" = "انت تستخدم %@ النسخه التجريبية من IINA";
-"initial.beta.desc" = "قم بإلغاء تحديد \"تلقي تحديثات بيتا\" من التفضيلات - عام، وتثبيت إصدار مستقر من <a href=\"https://iina.io\">موقعنا الرسمي</a>.";
-"initial.nightly.desc" = "لا ينصح باستخدام الليلة كمحرك أقراص يومي. حاليا لا تدعم الإنشاءات الليلية التحديث التلقائي. الرجاء تحميل أحدث الإصدارات يدويا من موقعنا على الشبكة</a> <a href=\"https://nightly.iina.io\">ليلا.";
+"initial.beta.desc" = "قم بإلغاء تحديد \"تلقي تحديثات بيتا\" من التفضيلات - عام، وتثبيت إصدار مستقر من <a href=\"https://dev.tekin.cn\">موقعنا الرسمي</a>.";
+"initial.nightly.desc" = "لا ينصح باستخدام الليلة كمحرك أقراص يومي. حاليا لا تدعم الإنشاءات الليلية التحديث التلقائي. الرجاء تحميل أحدث الإصدارات يدويا من موقعنا على الشبكة</a> <a href=\"https://dev.tekin.cn\">ليلا.";
 "initial.debug.desc" = "عادة ما لا يتم تحسين إصدارات التصحيح للأداء، لذلك لا يوصى باستخدامها كمحرك أقراص يومي. إصدارات التصحيح لا تدعم التحديث التلقائي.";
-"initial.bug_report" = "الإبلاغ عبر <a href=\"https://github.com/iina/iina/issues\">GitHub مشكلات</a>.";
+"initial.bug_report" = "الإبلاغ عبر <a href=\"https://github.com/tekintian/iina/issues\">GitHub مشكلات</a>.";
 
 // MainWindowController.swift
 "main.buffering_indicator" = "التخزين… %d%%";

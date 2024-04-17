@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "applications": {
     "gecko": {
-      "id": "open_in_iina_firefox@iina.io"
+      "id": "open_in_iina_firefox@tekin.cn"
     }
   },
   "name": "Open In IINA",

@@ -23,10 +23,10 @@
 
 // Initial Window
 "initial.announcement" = "Używasz wersji %@ IINA";
-"initial.beta.desc" = "Jeśli chcesz wrócić do wersji stabilnej, odznacz \"otrzymuj aktualizacje wersji beta\" w Ustawienia > Ogólne, i zainstaluj stabilne wydanie z naszej <a href=\"https://iina.io\">oficjalnej strony</a>.";
-"initial.nightly.desc" = "Wersje \"Nightly\" nie jest zalecana do codziennego użytku. Aktualnie nie wspierają one automatycznej aktualizacji. Pobierz ręcznie nowsze wydania z naszej <a href=\"https://nightly.iina.io\">strony wersji nightly</a>.";
+"initial.beta.desc" = "Jeśli chcesz wrócić do wersji stabilnej, odznacz \"otrzymuj aktualizacje wersji beta\" w Ustawienia > Ogólne, i zainstaluj stabilne wydanie z naszej <a href=\"https://dev.tekin.cn\">oficjalnej strony</a>.";
+"initial.nightly.desc" = "Wersje \"Nightly\" nie jest zalecana do codziennego użytku. Aktualnie nie wspierają one automatycznej aktualizacji. Pobierz ręcznie nowsze wydania z naszej <a href=\"https://dev.tekin.cn\">strony wersji nightly</a>.";
 "initial.debug.desc" = "Wersje \"Debug\" przeważnie nie są zoptymalizowane pod kątem wydajności, więc nie jest zalecane wykorzystywanie ich jako wersji codziennego użytku. Wersje \"Debug\" nie wspierają automatycznych aktualizacji.";
-"initial.bug_report" = "Zgłoś przez <a href=\"https://github.com/iina/iina/issues\">GitHub issues</a>.";
+"initial.bug_report" = "Zgłoś przez <a href=\"https://github.com/tekintian/iina/issues\">GitHub issues</a>.";
 
 // MainWindowController.swift
 "main.buffering_indicator" = "Buforowanie… %d%%";

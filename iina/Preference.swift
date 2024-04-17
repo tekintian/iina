@@ -294,7 +294,7 @@ struct Preference {
 
     static let iinaEnablePluginSystem = Key("iinaEnablePluginSystem")
 
-    /** Workaround for issue [#4688](https://github.com/iina/iina/issues/4688) */
+    /** Workaround for issue [#4688](https://github.com/tekintian/iina/issues/4688) */
     static let recentDocuments = Key("recentDocuments")
   }
 

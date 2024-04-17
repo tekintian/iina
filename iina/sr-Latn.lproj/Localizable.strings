@@ -23,10 +23,10 @@
 
 // Initial Window
 "initial.announcement" = "Koristite verziju %@ programa IINA";
-"initial.beta.desc" = "Ako želite da se vratite na stabilno izdanje, opozovite izbor stavke „primaj beta ažuriranja“ u okviru opcije Željene postavke – Opšte postavke, a zatim instalirajte stabilno izdanje sa <a href=\"https://iina.io\">zvaničnog veb-sajta</a>.";
-"initial.nightly.desc" = "Automatizovana izdanja ne preporučuju se za svakodnevno korišćenje. Trenutna automatizovana izdanja ne podržavaju automatsko ažuriranje. Ručno preuzmite najnovija izdanja s našeg veb-sajta za <a href=\"https://nightly.iina.io\">automatizovana izdanja</a>.";
+"initial.beta.desc" = "Ako želite da se vratite na stabilno izdanje, opozovite izbor stavke „primaj beta ažuriranja“ u okviru opcije Željene postavke – Opšte postavke, a zatim instalirajte stabilno izdanje sa <a href=\"https://dev.tekin.cn\">zvaničnog veb-sajta</a>.";
+"initial.nightly.desc" = "Automatizovana izdanja ne preporučuju se za svakodnevno korišćenje. Trenutna automatizovana izdanja ne podržavaju automatsko ažuriranje. Ručno preuzmite najnovija izdanja s našeg veb-sajta za <a href=\"https://dev.tekin.cn\">automatizovana izdanja</a>.";
 "initial.debug.desc" = "Izdanja za otklanjanje grešaka obično nisu optimizovana za performanse, tako da se ne preporučuju za svakodnevnu upotrebu. Izdanja za otklanjanje grešaka ne podržavaju automatsko ažuriranje.";
-"initial.bug_report" = "Prijavite putem <a href=\"https://github.com/iina/iina/issues\">problema na GitHubu</a>.";
+"initial.bug_report" = "Prijavite putem <a href=\"https://github.com/tekintian/iina/issues\">problema na GitHubu</a>.";
 
 // MainWindowController.swift
 "main.buffering_indicator" = "Smeštanje u bafer… %d%%";

@@ -176,7 +176,7 @@ class MPVController: NSObject {
     return machine.starts(with: "arm64")
   }
 
-  /// Apply a workaround for issue [#4486](https://github.com/iina/iina/issues/4486), if needed.
+  /// Apply a workaround for issue [#4486](https://github.com/tekintian/iina/issues/4486), if needed.
   ///
   /// On Macs with an Intel chip VP9 hardware acceleration is causing a hang in
   ///[VTDecompressionSessionWaitForAsynchronousFrames](https://developer.apple.com/documentation/videotoolbox/1536066-vtdecompressionsessionwaitforasy).
@@ -694,7 +694,7 @@ not applying FFmpeg 9599 workaround
   /// `MPV_FORMAT_NODE_MAP` are in **random** order. As a result sometimes the order of filter parameters in the filter string
   /// representation given by IINA to the mpv remove command would not match the order of parameters given when the filter was
   /// added to mpv and the remove command would fail to remove the filter. This was reported in
-  /// [IINA issue #3620 Audio filters with same name cannot be removed](https://github.com/iina/iina/issues/3620).
+  /// [IINA issue #3620 Audio filters with same name cannot be removed](https://github.com/tekintian/iina/issues/3620).
   ///
   /// The issue of `mpv_get_property` returning filter parameters in random order even though the remove command is sensitive to
   /// filter parameter order was raised with the mpv project in
@@ -818,7 +818,7 @@ not applying FFmpeg 9599 workaround
   func removeHooks(withIdentifier id: String) {
     hooks.filter { (k, v) in v.isJavascript && v.id == id }.keys.forEach { hooks.removeValue(forKey: $0) }
   }
-  
+
   // MARK: - Events
 
   // Read event and handle it async

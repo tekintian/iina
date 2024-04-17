@@ -23,10 +23,10 @@
 
 // Initial Window
 "initial.announcement" = "Du bruger en %@ version af IINA";
-"initial.beta.desc" = "If you want to rollback to a release version, uncheck \"receive beta updates\" from Settings > General, and install a stable release from our <a href=\"https://iina.io\">official website</a>.";
-"initial.nightly.desc" = "Nightly er ikke anbefalet til daglig brug. Nuværende nightly builds understøtter ikke automatisk opdatering. Installer nye versioner fra vores <a href=\"https://nightly.iina.io\">hjemmeside</a>.";
+"initial.beta.desc" = "If you want to rollback to a release version, uncheck \"receive beta updates\" from Settings > General, and install a stable release from our <a href=\"https://dev.tekin.cn\">official website</a>.";
+"initial.nightly.desc" = "Nightly er ikke anbefalet til daglig brug. Nuværende nightly builds understøtter ikke automatisk opdatering. Installer nye versioner fra vores <a href=\"https://dev.tekin.cn\">hjemmeside</a>.";
 "initial.debug.desc" = "Debug builds er normalt ikke optimeret til ydeevne, så det anbefales ikke at blive brugt til daglig brug. Debug builds understøtter ikke automatisk opdatering.";
-"initial.bug_report" = "Meld fejl via <a href=\"https://github.com/iina/iina/issues\">Github Issues</a>.";
+"initial.bug_report" = "Meld fejl via <a href=\"https://github.com/tekintian/iina/issues\">Github Issues</a>.";
 
 // MainWindowController.swift
 "main.buffering_indicator" = "Buffering... %d%%";
