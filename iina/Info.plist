@@ -627,7 +627,7 @@
 		</dict>
 	</array>
 	<key>SUFeedURL</key>
-	<string>https://api.tekin.cn/iina/appcast.xml</string>
+	<string>https://api.tekin.cn/iina/appcast?ver=stable&format=xml</string>
 	<key>SUPublicDSAKeyFile</key>
 	<string>dsa_pub.pem</string>
 	<key>SUPublicEDKey</key>
