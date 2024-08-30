@@ -20,15 +20,18 @@ class PrefCodecViewController: PreferenceViewController, PreferenceWindowEmbedda
   }
 
   var preferenceTabImage: NSImage {
-    return NSImage(named: NSImage.Name("pref_av"))!
+    return makeSymbol("play.rectangle.on.rectangle", fallbackImage: "pref_av")
   }
 
   override var sectionViews: [NSView] {
-    return [sectionVideoView, sectionAudioView]
+    return [sectionVideoView, sectionAudioView, sectionReplayGainView]
   }
 
   @IBOutlet var sectionVideoView: NSView!
   @IBOutlet var sectionAudioView: NSView!
+  @IBOutlet var sectionReplayGainView: NSView!
+  
+  @IBOutlet weak var audioDriverExperimentalIndicator: NSImageView!
 
   @IBOutlet weak var spdifAC3Btn: NSButton!
   @IBOutlet weak var spdifDTSBtn: NSButton!
@@ -50,6 +53,10 @@ class PrefCodecViewController: PreferenceViewController, PreferenceWindowEmbedda
 
   override func viewWillAppear() {
     super.viewWillAppear()
+    
+    if #available(macOS 14.0, *) {
+      audioDriverExperimentalIndicator.image = NSImage.findSFSymbol(["flask.fill"])
+    }
 
     audioDevicePopUp.removeAllItems()
     let audioDevices = PlayerCore.active.getAudioDevices()
@@ -113,5 +120,13 @@ class PrefCodecViewController: PreferenceViewController, PreferenceWindowEmbedda
 
   @IBAction func algorithmHelpAction(_ sender: Any) {
     NSWorkspace.shared.open(URL(string: AppData.algorithmHelpLink)!)
+  }
+
+  @IBAction func gainAdjustmentHelpAction(_ sender: Any) {
+    NSWorkspace.shared.open(URL(string: AppData.gainAdjustmentHelpLink)!)
+  }
+
+  @IBAction func audioDriverHelpAction(_ sender: Any) {
+    NSWorkspace.shared.open(URL(string: AppData.audioDriverHellpLink)!)
   }
 }

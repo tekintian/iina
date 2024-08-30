@@ -253,10 +253,12 @@ class HistoryWindowController: NSWindowController, NSOutlineViewDelegate, NSOutl
       reloadData()
       return
     }
-    let newObjects = HistoryController.shared.history.filter { entry in
-      let string = searchOption == .filename ? entry.name : entry.url.path
-      // Do a locale-aware, case and diacritic insensitive search:
-      return string.localizedStandardContains(searchString)
+    let newObjects = HistoryController.shared.$history.withLock {
+      $0.filter { entry in
+        let string = searchOption == .filename ? entry.name : entry.url.path
+        // Do a locale-aware, case and diacritic insensitive search:
+        return string.localizedStandardContains(searchString)
+      }
     }
     prepareData(fromHistory: newObjects)
     outlineView.reloadData()
@@ -349,4 +351,10 @@ class HistoryProgressCellView: NSTableCellView {
 
   @IBOutlet var indicator: NSProgressIndicator!
 
+  /// Prepares the receiver for service after it has been loaded from an Interface Builder archive, or nib file.
+  /// - Important: As per Apple's [Internationalization and Localization Guide](https://developer.apple.com/library/archive/documentation/MacOSX/Conceptual/BPInternational/SupportingRight-To-LeftLanguages/SupportingRight-To-LeftLanguages.html)
+  ///     timeline indicators should not flip in a right-to-left language. This can not be set in the XIB.
+  override func awakeFromNib() {
+    indicator.userInterfaceLayoutDirection = .leftToRight
+  }
 }

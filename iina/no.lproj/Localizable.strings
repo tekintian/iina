@@ -16,6 +16,9 @@
 "general.username" = "Brukernavn";
 "general.password" = "Passord";
 
+"input.value_is_empty" = "Value cannot be empty.";
+"input.already_exists" = "Value already exists.";
+
 // Guide Window
 "guide.highlights" = "Highlights";
 "guide.basic_settings" = "Grunnleggende innstillinger";
@@ -27,6 +30,9 @@
 "initial.nightly.desc" = "Nightly anbefales ikke til daglig bruk. For øyeblikket støtter ikke nightly-versjoner automatisk oppdatering. Last ned nyere versjoner fra vårt <a href=\"https://nightly.iina.io\">nightly nettsted</a>.";
 "initial.debug.desc" = "Feilsøkingsversjoner er vanligvis ikke optimalisert for ytelse, så det anbefales derfor ikke for daglig bruk. Feilsøkingsversjoner støtter ikke automatisk oppdatering.";
 "initial.bug_report" = "Meld feil via <a href=\"https://github.com/iina/iina/issues\">GitHub Issues</a>.";
+
+// Inspector Window
+"inspector.error" = "Feil";
 
 // MainWindowController.swift
 "main.buffering_indicator" = "Bufrer… %d%%";
@@ -43,6 +49,36 @@
 "quicksetting.hwdec" = "Maskinvaredekoding";
 "quicksetting.deinterlace" = "Deinterlace";
 "quicksetting.hdr" = "HDR";
+"quicksetting.hide" = "Skjul";
+
+// EQ Presets
+"eq.preset.flat" = "Flat";
+"eq.preset.acoustic" = "Acoustic";
+"eq.preset.classical" = "Classical";
+"eq.preset.dance" = "Dance";
+"eq.preset.deep" = "Deep";
+"eq.preset.electronic" = "Electronic";
+"eq.preset.hip_hop" = "Hip Hop";
+"eq.preset.increase_bass" = "Increase Bass";
+"eq.preset.increase_treble" = "Increase Treble";
+"eq.preset.increase_vocal" = "Increase Vocal";
+"eq.preset.jazz" = "Jazz";
+"eq.preset.latin" = "Latin";
+"eq.preset.loundness" = "Loundness";
+"eq.preset.lounge" = "Lounge";
+"eq.preset.piano" = "Piano";
+"eq.preset.pop" = "Pop";
+"eq.preset.rnb" = "R&B";
+"eq.preset.reduce_bass" = "Reduce Bass";
+"eq.preset.reduce_treble" = "Reduce Treble";
+"eq.preset.rock" = "Rock";
+"eq.preset.small_speaker" = "Small Speaker";
+"eq.preset.spoken_word" = "Spoken Word";
+
+"alert.eq.new_profile.title" = "New EQ Profile";
+"alert.eq.new_profile.message" = "Please enter a profile name.";
+"alert.eq.rename.title" = "Rename Currnet Profile";
+"alert.eq.rename.message" = "Please enter a new profile name.";
 
 // OSDMessage.swift
 "osd.pause" = "Pause";
@@ -61,6 +97,14 @@
 "osd.sub_delay.later" = "Undertekstforsinkelse: %.2fs senere";
 "osd.sub_delay.earlier" = "Undertekstforsinkelse: %.2fs tidligere";
 "osd.subtitle_pos" = "Undertekstposisjon: %.1f";
+"osd.sub_hidden" = "Subtitles Hidden";
+"osd.sub_visible" = "Subtitles Visible";
+"osd.sub_second_delay.nodelay" = "Secondary Subtitle Delay: No Delay";
+"osd.sub_second_delay.later" = "Secondary Subtitle Delay: %.2fs Later";
+"osd.sub_second_delay.earlier" = "Secondary Subtitle Delay: %.2fs Earlier";
+"osd.sub_second_hidden" = "Secondary Subtitles Hidden";
+"osd.sub_second_pos" = "Secondary Subtitle Position: %.1f";
+"osd.sub_second_visible" = "Secondary Subtitles Visible";
 "osd.mute" = "Demp";
 "osd.unmute" = "Opphev demping";
 "osd.screenshot" = "Skjermbilde lagret";
@@ -80,7 +124,8 @@
 "osd.find_online_sub" = "Finner understekster på nett…";
 "osd.find_online_sub.source" = "fra";
 "osd.sub_not_found" = "Ingen undertekster funnet";
-"osd.sub_found" = "%d undertekster funnet. Nedlaster…";
+"osd.sub_found" = "%d subtitles found.";
+"osd.sub_downloading" = "Downloading %d subtitles";
 "osd.sub_downloaded" = "Undertekster nedlastet";
 "osd.sub_saved" = "Undertekster lagret";
 "osd.network_error" = "Nettverksfeil";
@@ -116,10 +161,26 @@
 
 "preference.enable_adv_settings" = "Aktiver avanserte innstillinger";
 
+"preference.sub_override_level.no" = "no";
+"preference.sub_override_level.force" = "force";
+"preference.sub_override_level.scale" = "scale";
+"preference.sub_override_level.strip" = "fjern";
+"preference.sub_override_level.yes" = "yes";
+
+"preference.sub_override_level.descriptive_text.no" = "Render subtitles as specified by the subtitle scripts, without overrides.";
+"preference.sub_override_level.descriptive_text.force" = "Apply all subtitle styles.";
+"preference.sub_override_level.descriptive_text.scale" = "Apply the scale setting in addition to the style settings in this section.";
+"preference.sub_override_level.descriptive_text.strip" = "Radically strip all ASS tags and styles from the subtitle.";
+"preference.sub_override_level.descriptive_text.yes" = "Apply all the style settings in this section.";
+
 "menu.volume" = "Volum: %d";
 "menu.volume_muted" = "Volum: %d (dempet)";
 "menu.audio_delay" = "Lydforsinkelse: %.2fs";
 "menu.sub_delay" = "Undertekstforsinkelse: %.2fs";
+"menu.sub_hide" = "Hide Subtitles";
+"menu.sub_show" = "Show Subtitles";
+"menu.sub_second_hide" = "Hide Secondary Subtitles";
+"menu.sub_second_show" = "Show Secondary Subtitles";
 "menu.fullscreen" = "Gå til fullskjerm";
 "menu.exit_fullscreen" = "Avslutt fullskjerm";
 "menu.pip" = "Bilde-i-bilde";
@@ -151,10 +212,13 @@
 "menu.sub_delay_up" = "Undertekstforsinkelse + %.1fs";
 "menu.sub_delay_down" = "Undertekstforsinkelse - %.1fs";
 
-"menu.crop_custom" = "Egendefinert...";
+"menu.crop_custom" = "Custom…";
 "menu.find_online_sub" = "Finn undertekster på nettet fra %@";
 
+"track.audio" = "Lyd";
 "track.none" = "<None>";
+"track.sub" = "Undertekster";
+"track.video" = "Video";
 
 "subtrack.no_loaded" = "Ingen undertekster innlastet";
 "subtrack.no_external" = "Ingen eksterne undertekster funnet";
@@ -168,7 +232,6 @@
 
 "alert.fatal_error" = "Fatal feil: %@ \nProgrammet vil avslutte nå.";
 "alert.mpv_error" = "Intern feil %@ (%@) ved innstilling av %@.";
-"alert.sleep" = "Kan ikke forhindre skjermhvile! (0x%0X8)";
 
 "alert.unsupported_audio" = "Ustøttet ekstern lydfil.";
 "alert.unsupported_sub" = "Ustøttet ekstern undertekst.";
@@ -186,11 +249,13 @@
 "alert.config.duplicate.title" = "Duplicate Configuration";
 "alert.config.duplicate.message" = "Please enter name for the duplicated configuration file.";
 "alert.config.empty_name" = "The name cannot be empty.";
-"alert.config.name_existing" = "The name already exists.";
+"alert.config.name_existing" = "A config with the same name already exists.";
 "alert.config.file_existing.title" = "Filen finnes allerede";
-"alert.config.file_existing.message" = "This should not happen. Choose OK to overwrite, Cancel to reveal the file in Finder.";
+"alert.config.file_existing.message" = "A config file with the same filename already exists. Choose OK to show the file in Finder.";
 "alert.config.cannot_create" = "Cannot create config file!\n%@";
 "alert.config.cannot_write" = "Cannot write to config file!";
+"alert.config.rename.title" = "Rename Input Configuration";
+"alert.config.rename.message" = "Please enter the new name for the configuration.";
 
 "alert.filter.incorrect" = "Error occurred when setting filters. Please check your parameter format.";
 "alert.add_filter.title" = "New Filter";

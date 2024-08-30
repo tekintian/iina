@@ -16,6 +16,9 @@
 "general.username" = "Nom d'utilisateur";
 "general.password" = "Mot de passe";
 
+"input.value_is_empty" = "Value cannot be empty.";
+"input.already_exists" = "Value already exists.";
+
 // Guide Window
 "guide.highlights" = "Éléments-clés";
 "guide.basic_settings" = "Réglages de base";
@@ -27,6 +30,9 @@
 "initial.nightly.desc" = "Les versions quotidiennes ne sont pas recommandées pour être utilisées comme lecteur en production. Les versions quotidiennes ne prennent pas en charge la mise à jour automatique. Veuillez télécharger manuellement les dernières versions de notre site <a href=\"https://nightly.iina.io\">versions quotidiennes</a>.";
 "initial.debug.desc" = "Les versions de débogage ne sont généralement pas optimisées pour les performances, donc il n'est pas recommandé d'être utilisé comme lecteur en production. Les versions de débogage ne prennent pas en charge la mise à jour automatique.";
 "initial.bug_report" = "Signaler un bug via <a href=\"https://github.com/iina/iina/issues\">GitHub</a>.";
+
+// Inspector Window
+"inspector.error" = "Erreur";
 
 // MainWindowController.swift
 "main.buffering_indicator" = "Mise en mémoire tampon… %d%%";
@@ -43,6 +49,36 @@
 "quicksetting.hwdec" = "Décodage matériel";
 "quicksetting.deinterlace" = "Désentrelacer";
 "quicksetting.hdr" = "HDR";
+"quicksetting.hide" = "Cacher";
+
+// EQ Presets
+"eq.preset.flat" = "Flat";
+"eq.preset.acoustic" = "Acoustic";
+"eq.preset.classical" = "Classical";
+"eq.preset.dance" = "Dance";
+"eq.preset.deep" = "Deep";
+"eq.preset.electronic" = "Electronic";
+"eq.preset.hip_hop" = "Hip Hop";
+"eq.preset.increase_bass" = "Increase Bass";
+"eq.preset.increase_treble" = "Increase Treble";
+"eq.preset.increase_vocal" = "Increase Vocal";
+"eq.preset.jazz" = "Jazz";
+"eq.preset.latin" = "Latin";
+"eq.preset.loundness" = "Loundness";
+"eq.preset.lounge" = "Lounge";
+"eq.preset.piano" = "Piano";
+"eq.preset.pop" = "Pop";
+"eq.preset.rnb" = "R&B";
+"eq.preset.reduce_bass" = "Reduce Bass";
+"eq.preset.reduce_treble" = "Reduce Treble";
+"eq.preset.rock" = "Rock";
+"eq.preset.small_speaker" = "Small Speaker";
+"eq.preset.spoken_word" = "Spoken Word";
+
+"alert.eq.new_profile.title" = "New EQ Profile";
+"alert.eq.new_profile.message" = "Please enter a profile name.";
+"alert.eq.rename.title" = "Rename Currnet Profile";
+"alert.eq.rename.message" = "Please enter a new profile name.";
 
 // OSDMessage.swift
 "osd.pause" = "En pause";
@@ -61,6 +97,14 @@
 "osd.sub_delay.later" = "Délai des sous-titres : %.2fs en avance";
 "osd.sub_delay.earlier" = "Délai des sous-titres : %.2fs en retard";
 "osd.subtitle_pos" = "Position des sous-titres : %.1f";
+"osd.sub_hidden" = "Subtitles Hidden";
+"osd.sub_visible" = "Subtitles Visible";
+"osd.sub_second_delay.nodelay" = "Secondary Subtitle Delay: No Delay";
+"osd.sub_second_delay.later" = "Secondary Subtitle Delay: %.2fs Later";
+"osd.sub_second_delay.earlier" = "Secondary Subtitle Delay: %.2fs Earlier";
+"osd.sub_second_hidden" = "Secondary Subtitles Hidden";
+"osd.sub_second_pos" = "Secondary Subtitle Position: %.1f";
+"osd.sub_second_visible" = "Secondary Subtitles Visible";
 "osd.mute" = "Son coupé";
 "osd.unmute" = "Son rétabli";
 "osd.screenshot" = "Une capture d'écran a été prise";
@@ -80,7 +124,8 @@
 "osd.find_online_sub" = "Recherche de sous-titres en ligne…";
 "osd.find_online_sub.source" = "de";
 "osd.sub_not_found" = "Aucun sous-titre trouvé";
-"osd.sub_found" = "%d sous-titre(s) trouvé(s). Téléchargement…";
+"osd.sub_found" = "%d subtitles found.";
+"osd.sub_downloading" = "Downloading %d subtitles";
 "osd.sub_downloaded" = "Sous-titre téléchargé";
 "osd.sub_saved" = "Sous-titre sauvegardé";
 "osd.network_error" = "Erreur réseau";
@@ -116,10 +161,26 @@
 
 "preference.enable_adv_settings" = "Activer les paramètres avancés";
 
+"preference.sub_override_level.no" = "no";
+"preference.sub_override_level.force" = "forcer";
+"preference.sub_override_level.scale" = "scale";
+"preference.sub_override_level.strip" = "retirer";
+"preference.sub_override_level.yes" = "oui";
+
+"preference.sub_override_level.descriptive_text.no" = "Render subtitles as specified by the subtitle scripts, without overrides.";
+"preference.sub_override_level.descriptive_text.force" = "Apply all subtitle styles.";
+"preference.sub_override_level.descriptive_text.scale" = "Apply the scale setting in addition to the style settings in this section.";
+"preference.sub_override_level.descriptive_text.strip" = "Radically strip all ASS tags and styles from the subtitle.";
+"preference.sub_override_level.descriptive_text.yes" = "Apply all the style settings in this section.";
+
 "menu.volume" = "Volume : %d";
 "menu.volume_muted" = "Volume : %d (coupé)";
 "menu.audio_delay" = "Délai audio : %.2fs";
 "menu.sub_delay" = "Délai des sous-titres : %.2fs";
+"menu.sub_hide" = "Hide Subtitles";
+"menu.sub_show" = "Show Subtitles";
+"menu.sub_second_hide" = "Hide Secondary Subtitles";
+"menu.sub_second_show" = "Show Secondary Subtitles";
 "menu.fullscreen" = "Plein écran";
 "menu.exit_fullscreen" = "Quitter le mode plein écran";
 "menu.pip" = "Passer en inscrustation";
@@ -151,10 +212,13 @@
 "menu.sub_delay_up" = "Délai des sous-titres +%.1fs";
 "menu.sub_delay_down" = "Délai des sous-titres -%.1fs";
 
-"menu.crop_custom" = "Personnalisé…";
+"menu.crop_custom" = "Perso…";
 "menu.find_online_sub" = "Chercher des sous-titres en ligne sur %@";
 
+"track.audio" = "Audio";
 "track.none" = "<Aucun>";
+"track.sub" = "Sous-titres";
+"track.video" = "Vidéo";
 
 "subtrack.no_loaded" = "Aucun sous-titre chargé";
 "subtrack.no_external" = "Aucun sous-titre externe trouvé";
@@ -168,7 +232,6 @@
 
 "alert.fatal_error" = "Erreur fatale : %@ \nL'application va maintenant quitter.";
 "alert.mpv_error" = "Erreur %@ (%@) lors de la configuration de l'option %@.";
-"alert.sleep" = "Impossible d'empêcher la veille de l'écran ! (0x%0X8)";
 
 "alert.unsupported_audio" = "Fichier audio externe non supporté.";
 "alert.unsupported_sub" = "Fichier sous-titre externe non supporté.";
@@ -186,11 +249,13 @@
 "alert.config.duplicate.title" = "Dupliquer la configuration";
 "alert.config.duplicate.message" = "Veuillez entrer un nom pour le fichier de configuration dupliqué.";
 "alert.config.empty_name" = "Le nom ne peut pas être vide.";
-"alert.config.name_existing" = "Ce nom existe déjà.";
+"alert.config.name_existing" = "A config with the same name already exists.";
 "alert.config.file_existing.title" = "Le fichier existe déjà";
-"alert.config.file_existing.message" = "Ceci n'est pas censé arriver. Cliquez OK pour écraser ou Annuler pour révéler le fichier dans le Finder.";
+"alert.config.file_existing.message" = "A config file with the same filename already exists. Choose OK to show the file in Finder.";
 "alert.config.cannot_create" = "Impossible de créer le fichier de configuration ! %@";
 "alert.config.cannot_write" = "Impossible d'écrire sur le fichier de configuration !";
+"alert.config.rename.title" = "Rename Input Configuration";
+"alert.config.rename.message" = "Please enter the new name for the configuration.";
 
 "alert.filter.incorrect" = "Une erreur est survenue lors de la configuration des filtres. Veuillez vérifier le format de votre paramètre.";
 "alert.add_filter.title" = "Nouveau filtre";
@@ -268,8 +333,8 @@
 
 "alert.plugin_uninstall.title" = "Êtes-vous sûr de vouloir désinstaller %@ ?";
 "alert.plugin_uninstall.message" = "Cette extension sera supprimée de votre disque dur.";
-"alert.plugin_reinstall.title" = "Le plugin %@ existe déjà";
-"alert.plugin_reinstall.message" = "Voulez-vous réinstaller le plugin ?";
+"alert.plugin_reinstall.title" = "L'extension %@ existe déjà";
+"alert.plugin_reinstall.message" = "Souhaitez-vous réinstaller cette extension ?";
 "alert.duplicated_plugin_id" = "Plusieurs extensions ont le même identifiant : \"%@\". Cela peut entraîner des comportements anormaux. Vous pouvez les identifier Préférences - Extensions et le signaler à leurs auteurs. Si une extension est installée localement, vous pouvez changer manuellement son identifiant dans le fichier Info.json de celle-ci.";
 "alert.plugin_no_update" = "Aucune mise à jour disponible.";
 "alert.plugin_update_found.title" = "Mise à jour disponible pour %@";

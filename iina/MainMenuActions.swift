@@ -9,7 +9,7 @@
 import Cocoa
 
 
-class MainMenuActionHandler: NSResponder {
+class MainMenuActionHandler: NSResponder, NSMenuItemValidation {
 
   unowned var player: PlayerCore
 
@@ -23,9 +23,8 @@ class MainMenuActionHandler: NSResponder {
   }
 
   @objc func menuShowInspector(_ sender: AnyObject) {
-    let inspector = (NSApp.delegate as! AppDelegate).inspector
+    let inspector = AppDelegate.shared.inspector
     inspector.showWindow(self)
-    inspector.updateInfo()
   }
 
   @objc func menuSavePlaylist(_ sender: NSMenuItem) {
@@ -46,8 +45,13 @@ class MainMenuActionHandler: NSResponder {
     }
   }
 
+  @objc func menuShowCurrentFileInFinder(_ sender: NSMenuItem) {
+    guard let url = player.info.currentURL, !player.info.isNetworkResource else { return }
+    NSWorkspace.shared.activateFileViewerSelecting([url])
+  }
+
   @objc func menuDeleteCurrentFile(_ sender: NSMenuItem) {
-    guard let url = player.info.currentURL else { return }
+    guard let url = player.info.currentURL, !player.info.isNetworkResource else { return }
     do {
       let index = player.mpv.getInt(MPVProperty.playlistPos)
       player.playlistRemove(index)
@@ -103,7 +107,7 @@ extension MainMenuActionHandler {
   }
 
   @objc func menuStepFrame(_ sender: NSMenuItem) {
-    if player.info.isPlaying {
+    if player.info.state == .playing {
       player.pause()
     }
     if sender.tag == 0 { // -> 1f
@@ -277,7 +281,8 @@ extension MainMenuActionHandler {
         }
       }
     }
-    if let vfWindow = (NSApp.delegate as? AppDelegate)?.vfWindow, vfWindow.loaded {
+    let vfWindow = AppDelegate.shared.vfWindow
+    if vfWindow.loaded {
       vfWindow.reloadTable()
     }
   }
@@ -286,6 +291,15 @@ extension MainMenuActionHandler {
 // MARK: - Audio
 
 extension MainMenuActionHandler {
+  @objc func menuLoadExternalAudio(_ sender: NSMenuItem) {
+    let currentDir = player.info.currentURL?.deletingLastPathComponent()
+    Utility.quickOpenPanel(title: "Load external audio file", chooseDir: false, dir: currentDir,
+                           sheetWindow: player.currentWindow,
+                           allowedFileTypes: Utility.playableFileExt) { url in
+      self.player.loadExternalAudioFile(url)
+    }
+  }
+
   @objc func menuChangeVolume(_ sender: NSMenuItem) {
     if let volumeDelta = sender.representedObject as? Int {
       let newVolume = Double(volumeDelta) + player.info.volume
@@ -329,6 +343,14 @@ extension MainMenuActionHandler {
                            sheetWindow: player.currentWindow) { url in
       self.player.loadExternalSubFile(url, delay: true)
     }
+  }
+
+  @objc func menuToggleSubVisibility(_ sender: NSMenuItem) {
+    player.toggleSubVisibility()
+  }
+
+  @objc func menuToggleSecondSubVisibility(_ sender: NSMenuItem) {
+    player.toggleSecondSubVisibility()
   }
 
   @objc func menuChangeSubDelay(_ sender: NSMenuItem) {
@@ -389,14 +411,13 @@ extension MainMenuActionHandler {
         self.player.sendOSD(.downloadedSub(
           urls.map({ $0.lastPathComponent }).joined(separator: "\n")
         ))
-        self.player.info.haveDownloadedSub = true
       }
       self.player.isSearchingOnlineSubtitle = false
     }
   }
 
   @objc func saveDownloadedSub(_ sender: NSMenuItem) {
-    let selected = player.info.subTracks.filter { $0.id == player.info.sid }
+    let selected = player.info.$subTracks.withLock { $0.filter { $0.id == player.info.sid } }
     guard selected.count > 0 else {
       Utility.showAlert("sub.no_selected")
 
@@ -440,6 +461,24 @@ extension MainMenuActionHandler {
     case 1: player.mpv.command(.cycle, args: ["audio"])
     case 2: player.mpv.command(.cycle, args: ["sub"])
     default: break
+    }
+  }
+
+  func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
+    switch menuItem.action {
+    case #selector(menuDeleteCurrentFile(_:)), #selector(menuShowCurrentFileInFinder(_:)):
+      return player.info.currentURL != nil && !player.info.isNetworkResource
+    default:
+      break
+    }
+    return true
+  }
+
+  // MARK: - Plugin
+
+  @objc func reloadAllPlugins(_ sender: NSMenuItem) {
+    for plugin in JavascriptPlugin.plugins {
+      player.reloadPlugin(plugin, forced: true)
     }
   }
 }

@@ -16,6 +16,9 @@
 "general.username" = "Uživatel";
 "general.password" = "Heslo";
 
+"input.value_is_empty" = "Value cannot be empty.";
+"input.already_exists" = "Value already exists.";
+
 // Guide Window
 "guide.highlights" = "Co je v IINA nového";
 "guide.basic_settings" = "Základní nastavení";
@@ -27,6 +30,9 @@
 "initial.nightly.desc" = "Noční sestavení nejsou doporučena pro každodenní použití. V současné době nepodporují automatické aktualizace. Stáhněte si ručně novější sestavení z naší <a href=\"https://nightly.iina.io\">noční webové stránky</a>.";
 "initial.debug.desc" = "Ladící sestavení obvykle nejsou optimalizována pro výkon, nejsou tedy doporučena pro každodenní použití. Ladící sestavení nepodporují automatické aktualizace.";
 "initial.bug_report" = "Nahlaste na <a href=\"https://github.com/iina/iina/issues\">GitHub</a>.";
+
+// Inspector Window
+"inspector.error" = "Chyba";
 
 // MainWindowController.swift
 "main.buffering_indicator" = "Načítá se… %d%%";
@@ -43,6 +49,36 @@
 "quicksetting.hwdec" = "Hardwarově dekódovat";
 "quicksetting.deinterlace" = "Odebrat prokládání";
 "quicksetting.hdr" = "HDR";
+"quicksetting.hide" = "Skrýt";
+
+// EQ Presets
+"eq.preset.flat" = "Flat";
+"eq.preset.acoustic" = "Acoustic";
+"eq.preset.classical" = "Classical";
+"eq.preset.dance" = "Dance";
+"eq.preset.deep" = "Deep";
+"eq.preset.electronic" = "Electronic";
+"eq.preset.hip_hop" = "Hip Hop";
+"eq.preset.increase_bass" = "Increase Bass";
+"eq.preset.increase_treble" = "Increase Treble";
+"eq.preset.increase_vocal" = "Increase Vocal";
+"eq.preset.jazz" = "Jazz";
+"eq.preset.latin" = "Latin";
+"eq.preset.loundness" = "Loundness";
+"eq.preset.lounge" = "Lounge";
+"eq.preset.piano" = "Piano";
+"eq.preset.pop" = "Pop";
+"eq.preset.rnb" = "R&B";
+"eq.preset.reduce_bass" = "Reduce Bass";
+"eq.preset.reduce_treble" = "Reduce Treble";
+"eq.preset.rock" = "Rock";
+"eq.preset.small_speaker" = "Small Speaker";
+"eq.preset.spoken_word" = "Spoken Word";
+
+"alert.eq.new_profile.title" = "New EQ Profile";
+"alert.eq.new_profile.message" = "Please enter a profile name.";
+"alert.eq.rename.title" = "Rename Currnet Profile";
+"alert.eq.rename.message" = "Please enter a new profile name.";
 
 // OSDMessage.swift
 "osd.pause" = "Pozastaveno";
@@ -61,6 +97,14 @@
 "osd.sub_delay.later" = "Zpoždění titulků: %.2f s";
 "osd.sub_delay.earlier" = "Zpoždění titulků: −%.2f s";
 "osd.subtitle_pos" = "Umístění titulků: %.1f";
+"osd.sub_hidden" = "Titulky skryty";
+"osd.sub_visible" = "Subtitles Visible";
+"osd.sub_second_delay.nodelay" = "Secondary Subtitle Delay: No Delay";
+"osd.sub_second_delay.later" = "Secondary Subtitle Delay: %.2fs Later";
+"osd.sub_second_delay.earlier" = "Secondary Subtitle Delay: %.2fs Earlier";
+"osd.sub_second_hidden" = "Druhé titulky skryty";
+"osd.sub_second_pos" = "Secondary Subtitle Position: %.1f";
+"osd.sub_second_visible" = "Secondary Subtitles Visible";
 "osd.mute" = "Ztlumeno";
 "osd.unmute" = "Zesíleno";
 "osd.screenshot" = "Snímek obrazovky pořízen";
@@ -80,7 +124,8 @@
 "osd.find_online_sub" = "Vyhledávám titulky online…";
 "osd.find_online_sub.source" = "z";
 "osd.sub_not_found" = "Titulky nenalezeny";
-"osd.sub_found" = "Nalezených titulků: %d Stahuji…";
+"osd.sub_found" = "%d subtitles found.";
+"osd.sub_downloading" = "Downloading %d subtitles";
 "osd.sub_downloaded" = "Titulky staženy";
 "osd.sub_saved" = "Titulky uloženy";
 "osd.network_error" = "Chyba sítě";
@@ -116,10 +161,26 @@
 
 "preference.enable_adv_settings" = "Povolit pokročilá nastavení";
 
+"preference.sub_override_level.no" = "no";
+"preference.sub_override_level.force" = "force";
+"preference.sub_override_level.scale" = "scale";
+"preference.sub_override_level.strip" = "Základní";
+"preference.sub_override_level.yes" = "yes";
+
+"preference.sub_override_level.descriptive_text.no" = "Render subtitles as specified by the subtitle scripts, without overrides.";
+"preference.sub_override_level.descriptive_text.force" = "Apply all subtitle styles.";
+"preference.sub_override_level.descriptive_text.scale" = "Apply the scale setting in addition to the style settings in this section.";
+"preference.sub_override_level.descriptive_text.strip" = "Radically strip all ASS tags and styles from the subtitle.";
+"preference.sub_override_level.descriptive_text.yes" = "Apply all the style settings in this section.";
+
 "menu.volume" = "Hlasitost: %d";
 "menu.volume_muted" = "Hlasitost: %d (Ztlumeno)";
 "menu.audio_delay" = "Zpoždění zvuku: %.2f s";
 "menu.sub_delay" = "Zpoždění titulků: %.2f s";
+"menu.sub_hide" = "Skrýt titulky";
+"menu.sub_show" = "Zobrazit titulky";
+"menu.sub_second_hide" = "Skrýt druhé titulky";
+"menu.sub_second_show" = "Zobrazit druhé titulky";
 "menu.fullscreen" = "Spustit režim celé obrazovky";
 "menu.exit_fullscreen" = "Ukončit režim celé obrazovky";
 "menu.pip" = "Spustit obraz v obrazu";
@@ -154,7 +215,10 @@
 "menu.crop_custom" = "Vlastní…";
 "menu.find_online_sub" = "Vyhledat titulky online z %@";
 
+"track.audio" = "Zvuk";
 "track.none" = "<Žádné>";
+"track.sub" = "Titulky";
+"track.video" = "Video";
 
 "subtrack.no_loaded" = "Nejsou načteny žádné titulky";
 "subtrack.no_external" = "Nenalezeny žádné externí titulky";
@@ -168,7 +232,6 @@
 
 "alert.fatal_error" = "Závažná chyba: %@ \nAplikace se teď ukončí.";
 "alert.mpv_error" = "Vnitřní chyba %@ (%@) při nastavení možnosti %@.";
-"alert.sleep" = "Nelze zakázat automatické vypnutí monitoru! (0x%0X8)";
 
 "alert.unsupported_audio" = "Nepodporovaný externí zvukový soubor.";
 "alert.unsupported_sub" = "Nepodporované externí titulky.";
@@ -186,11 +249,13 @@
 "alert.config.duplicate.title" = "Duplicitní konfigurace";
 "alert.config.duplicate.message" = "Zadejte název pro duplicitní konfigurační soubor.";
 "alert.config.empty_name" = "Název nemůže být prázdný.";
-"alert.config.name_existing" = "Název již existuje.";
+"alert.config.name_existing" = "A config with the same name already exists.";
 "alert.config.file_existing.title" = "Soubor již existuje.";
-"alert.config.file_existing.message" = "Toto by se nemělo stát. Vyberte OK pro přepsání, Zrušit pro zobrazení souboru v aplikaci Finder.";
+"alert.config.file_existing.message" = "A config file with the same filename already exists. Choose OK to show the file in Finder.";
 "alert.config.cannot_create" = "Konfigurační soubor nelze vytvořit!\n%@";
 "alert.config.cannot_write" = "Nelze zapisovat do konfiguračního souboru!";
+"alert.config.rename.title" = "Rename Input Configuration";
+"alert.config.rename.message" = "Please enter the new name for the configuration.";
 
 "alert.filter.incorrect" = "Při nastavování filtrů došlo k chybě. Zkontrolujte prosím formát parametru.";
 "alert.add_filter.title" = "Přidat filtr";

@@ -26,7 +26,7 @@
 "MGo-J8-zWE.title" = "רשימת השמעה";
 
 /* Class = "NSButtonCell"; title = "Clear Playback History…"; ObjectID = "MP6-Em-Lp4"; */
-"MP6-Em-Lp4.title" = "מחק הסטוריית השמעה…";
+"MP6-Em-Lp4.title" = "מחק היסטוריית השמעה…";
 
 /* Class = "NSTextFieldCell"; title = "Default Application"; ObjectID = "ORO-lK-yK5"; */
 "ORO-lK-yK5.title" = "יישום ברירת המחדל";
@@ -50,7 +50,7 @@
 "kbP-VI-dmT.title" = "ביטול";
 
 /* Class = "NSTextFieldCell"; title = "Restore Alerts"; ObjectID = "AAD-Db-Acs"; */
-"AAD-Db-Acs.title" = "שחזר התראות";
+"AAD-Db-Acs.title" = "שחזור התראות";
 
 /* Class = "NSButtonCell"; title = "Restore Suppressed Alerts…"; ObjectID = "XAz-xa-LVo"; */
 "XAz-xa-LVo.title" = "שחזר התראות שהוסתרו…";
@@ -62,7 +62,7 @@
 "F5i-KF-2SW.title" = "הלחצן למטה ישחזר את כל ההתראות שהוסתרו באמצעות תיבת הסימון \"אל תציג הודעה זו שוב\".";
 
 /* Class = "NSTextFieldCell"; title = "The button below will delete all files in the \"watch later\" folder. These files contain all saved playback progress and settings applied during playback."; ObjectID = "pPC-q2-9Gh"; */
-"pPC-q2-9Gh.title" = "הכפתור למטה ימחק את כל הקבצים בתיקיית \"צפה אחר כך\". קבצים אלה מכילים את מיקום ההאזנה בקובץ ואת ההגדרות שהוחלו במהלך ההפעלה.";
+"pPC-q2-9Gh.title" = "הכפתור למטה ימחק את כל הקבצים בתיקיית \"לצפיה אחר כך\". קבצים אלה מכילים את מיקום ההאזנה בקובץ ואת ההגדרות שהוחלו במהלך ההפעלה.";
 
 /* Class = "NSTextFieldCell"; title = "Calculating…"; ObjectID = "tRq-eU-AV3"; */
 "tRq-eU-AV3.title" = "מחשב…";

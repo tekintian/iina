@@ -7,32 +7,38 @@
 */
 // Common
 
-"general.on" = "On";
-"general.off" = "Off";
+"general.on" = "Укл";
+"general.off" = "Выкл";
 "general.login" = "Login";
-"general.logout" = "Logout";
+"general.logout" = "Выйсці";
 "general.ok" = "Добра";
 "general.cancel" = "Скасаваць";
-"general.username" = "Username";
-"general.password" = "Password";
+"general.username" = "Імя карыстальніка";
+"general.password" = "Пароль";
+
+"input.value_is_empty" = "Value cannot be empty.";
+"input.already_exists" = "Value already exists.";
 
 // Guide Window
 "guide.highlights" = "Highlights";
-"guide.basic_settings" = "Basic Settings";
-"guide.faq" = "Frequently Asked Questions";
+"guide.basic_settings" = "Асноўныя налады";
+"guide.faq" = "Частыя пытанні";
 
 // Initial Window
-"initial.announcement" = "You are using a %@ version of IINA";
+"initial.announcement" = "Вы выкарыстоўваеце %@ версію IINA";
 "initial.beta.desc" = "If you want to rollback to a release version, uncheck \"receive beta updates\" from Settings > General, and install a stable release from our <a href=\"https://iina.io\">official website</a>.";
 "initial.nightly.desc" = "Nightly is not recommended to be used as daily drive. Currently nightly builds do not support auto update. Please manually download newer builds from our <a href=\"https://nightly.iina.io\">nightly website</a>.";
 "initial.debug.desc" = "Debug builds are usually not optimized for performance, so it is not recommended to be used as daily drive. Debug builds do not support auto update.";
 "initial.bug_report" = "Report via <a href=\"https://github.com/iina/iina/issues\">GitHub issues</a>.";
 
+// Inspector Window
+"inspector.error" = "Памылкі";
+
 // MainWindowController.swift
 "main.buffering_indicator" = "Buffering… %d%%";
 "main.opening_stream" = "Opening stream…";
 "osc.precision" = "Precision";
-"osc.1s" = "1 second";
+"osc.1s" = "1 секунда";
 "osc.100ms" = "100 milliseconds";
 "osc.10ms" = "10 milliseconds";
 "osc.1ms" = "1 millisecond";
@@ -43,9 +49,39 @@
 "quicksetting.hwdec" = "Hardware Decoding";
 "quicksetting.deinterlace" = "Deinterlace";
 "quicksetting.hdr" = "HDR";
+"quicksetting.hide" = "Hide";
+
+// EQ Presets
+"eq.preset.flat" = "Flat";
+"eq.preset.acoustic" = "Acoustic";
+"eq.preset.classical" = "Classical";
+"eq.preset.dance" = "Dance";
+"eq.preset.deep" = "Deep";
+"eq.preset.electronic" = "Electronic";
+"eq.preset.hip_hop" = "Hip Hop";
+"eq.preset.increase_bass" = "Increase Bass";
+"eq.preset.increase_treble" = "Increase Treble";
+"eq.preset.increase_vocal" = "Increase Vocal";
+"eq.preset.jazz" = "Jazz";
+"eq.preset.latin" = "Latin";
+"eq.preset.loundness" = "Loundness";
+"eq.preset.lounge" = "Lounge";
+"eq.preset.piano" = "Piano";
+"eq.preset.pop" = "Pop";
+"eq.preset.rnb" = "R&B";
+"eq.preset.reduce_bass" = "Reduce Bass";
+"eq.preset.reduce_treble" = "Reduce Treble";
+"eq.preset.rock" = "Rock";
+"eq.preset.small_speaker" = "Small Speaker";
+"eq.preset.spoken_word" = "Spoken Word";
+
+"alert.eq.new_profile.title" = "New EQ Profile";
+"alert.eq.new_profile.message" = "Please enter a profile name.";
+"alert.eq.rename.title" = "Rename Currnet Profile";
+"alert.eq.rename.message" = "Please enter a new profile name.";
 
 // OSDMessage.swift
-"osd.pause" = "Pause";
+"osd.pause" = "Паўза";
 "osd.resume" = "Аднавіць";
 "osd.volume" = "Volume: %i";
 "osd.speed" = "Speed: %.2fx";
@@ -61,13 +97,21 @@
 "osd.sub_delay.later" = "Subtitle Delay: %.2fs Later";
 "osd.sub_delay.earlier" = "Subtitle Delay: %.2fs Earlier";
 "osd.subtitle_pos" = "Subtitle Position: %.1f";
+"osd.sub_hidden" = "Subtitles Hidden";
+"osd.sub_visible" = "Subtitles Visible";
+"osd.sub_second_delay.nodelay" = "Secondary Subtitle Delay: No Delay";
+"osd.sub_second_delay.later" = "Secondary Subtitle Delay: %.2fs Later";
+"osd.sub_second_delay.earlier" = "Secondary Subtitle Delay: %.2fs Earlier";
+"osd.sub_second_hidden" = "Secondary Subtitles Hidden";
+"osd.sub_second_pos" = "Secondary Subtitle Position: %.1f";
+"osd.sub_second_visible" = "Secondary Subtitles Visible";
 "osd.mute" = "Mute";
 "osd.unmute" = "Unmute";
 "osd.screenshot" = "Screenshot Captured";
 "osd.abloop.a" = "AB-Loop: A";
 "osd.abloop.b" = "AB-Loop: B";
 "osd.abloop.clear" = "AB-Loop: Cleared";
-"osd.stop" = "Stop";
+"osd.stop" = "Спыніць";
 "osd.chapter" = "Chapter: %@";
 "osd.subtitle_scale" = "Subtitle Scale: %.2fx";
 "osd.add_to_playlist" = "Added %i Files to Playlist";
@@ -80,7 +124,8 @@
 "osd.find_online_sub" = "Finding online subtitles…";
 "osd.find_online_sub.source" = "from";
 "osd.sub_not_found" = "No subtitles found";
-"osd.sub_found" = "%d subtitles found. Downloading…";
+"osd.sub_found" = "%d subtitles found.";
+"osd.sub_downloading" = "Downloading %d subtitles";
 "osd.sub_downloaded" = "Subtitle downloaded";
 "osd.sub_saved" = "Subtitle saved";
 "osd.network_error" = "Network error";
@@ -116,17 +161,33 @@
 
 "preference.enable_adv_settings" = "Enable advanced settings";
 
+"preference.sub_override_level.no" = "no";
+"preference.sub_override_level.force" = "force";
+"preference.sub_override_level.scale" = "scale";
+"preference.sub_override_level.strip" = "strip";
+"preference.sub_override_level.yes" = "yes";
+
+"preference.sub_override_level.descriptive_text.no" = "Render subtitles as specified by the subtitle scripts, without overrides.";
+"preference.sub_override_level.descriptive_text.force" = "Apply all subtitle styles.";
+"preference.sub_override_level.descriptive_text.scale" = "Apply the scale setting in addition to the style settings in this section.";
+"preference.sub_override_level.descriptive_text.strip" = "Radically strip all ASS tags and styles from the subtitle.";
+"preference.sub_override_level.descriptive_text.yes" = "Apply all the style settings in this section.";
+
 "menu.volume" = "Volume: %d";
 "menu.volume_muted" = "Volume: %d (Muted)";
 "menu.audio_delay" = "Audio Delay: %.2fs";
 "menu.sub_delay" = "Subtitle Delay: %.2fs";
+"menu.sub_hide" = "Hide Subtitles";
+"menu.sub_show" = "Show Subtitles";
+"menu.sub_second_hide" = "Hide Secondary Subtitles";
+"menu.sub_second_show" = "Show Secondary Subtitles";
 "menu.fullscreen" = "Enter Full Screen";
 "menu.exit_fullscreen" = "Exit Full Screen";
 "menu.pip" = "Enter Picture-in-Picture";
 "menu.exit_pip" = "Exit Picture-in-Picture";
 "menu.mini_player" = "Enter Music Mode";
 "menu.exit_mini_player" = "Exit Music Mode";
-"menu.pause" = "Pause";
+"menu.pause" = "Паўза";
 "menu.resume" = "Аднавіць";
 "menu.speed" = "Speed: %.2fx";
 "menu.chapters" = "Show Chapters Panel";
@@ -151,10 +212,13 @@
 "menu.sub_delay_up" = "Subtitle Delay + %.1fs";
 "menu.sub_delay_down" = "Subtitle Delay - %.1fs";
 
-"menu.crop_custom" = "Custom...";
+"menu.crop_custom" = "Custom…";
 "menu.find_online_sub" = "Find Online Subtitles from %@";
 
+"track.audio" = "Audio";
 "track.none" = "<None>";
+"track.sub" = "Subtitle";
+"track.video" = "Video";
 
 "subtrack.no_loaded" = "No Subtitles Loaded";
 "subtrack.no_external" = "No External Subtitles Found";
@@ -168,7 +232,6 @@
 
 "alert.fatal_error" = "Fatal error: %@ \nThe application will exit now.";
 "alert.mpv_error" = "Internal error %@ (%@) when setting option %@.";
-"alert.sleep" = "Cannot prevent display sleep! (0x%0X8)";
 
 "alert.unsupported_audio" = "Unsupported external audio file.";
 "alert.unsupported_sub" = "Unsupported external subtitle.";
@@ -186,11 +249,13 @@
 "alert.config.duplicate.title" = "Duplicate Configuration";
 "alert.config.duplicate.message" = "Please enter name for the duplicated configuration file.";
 "alert.config.empty_name" = "The name cannot be empty.";
-"alert.config.name_existing" = "The name already exists.";
+"alert.config.name_existing" = "A config with the same name already exists.";
 "alert.config.file_existing.title" = "File Already Exists";
-"alert.config.file_existing.message" = "This should not happen. Choose OK to overwrite, Cancel to reveal the file in Finder.";
+"alert.config.file_existing.message" = "A config file with the same filename already exists. Choose OK to show the file in Finder.";
 "alert.config.cannot_create" = "Cannot create config file!\n%@";
 "alert.config.cannot_write" = "Cannot write to config file!";
+"alert.config.rename.title" = "Rename Input Configuration";
+"alert.config.rename.message" = "Please enter the new name for the configuration.";
 
 "alert.filter.incorrect" = "Error occurred when setting filters. Please check your parameter format.";
 "alert.add_filter.title" = "New Filter";
@@ -321,7 +386,7 @@
 
 "mini_player.album_art" = "Toggle album art";
 "mini_player.loop" = "Repeat";
-"mini_player.shuffle" = "Shuffle";
+"mini_player.shuffle" = "Перамяшаць";
 "mini_player.remove" = "Remove from playlist";
 "mini_player.add" = "Add to playlist";
 "mini_player.delete" = "Delete all tracks from playlist";

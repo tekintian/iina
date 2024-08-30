@@ -117,31 +117,6 @@ class OpenSubClient {
   private let decoder: JSONDecoder = {
     let decoder = JSONDecoder()
     decoder.keyDecodingStrategy = .convertFromSnakeCase
-    guard #available(macOS 10.12, *) else {
-      let iso8601 = DateFormatter()
-      iso8601.calendar = Calendar(identifier: .iso8601)
-      iso8601.locale = Locale(identifier: "en_US_POSIX")
-      iso8601.timeZone = TimeZone(secondsFromGMT: 0)
-      iso8601.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
-      let iso8601WithFractionalSeconds = DateFormatter()
-      iso8601WithFractionalSeconds.calendar = Calendar(identifier: .iso8601)
-      iso8601WithFractionalSeconds.locale = Locale(identifier: "en_US_POSIX")
-      iso8601WithFractionalSeconds.timeZone = TimeZone(secondsFromGMT: 0)
-      iso8601WithFractionalSeconds.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSZ"
-      decoder.dateDecodingStrategy = .custom({ (decoder) -> Date in
-        let container = try decoder.singleValueContainer()
-        let dateStr = try container.decode(String.self)
-        if let date = iso8601.date(from: dateStr) {
-          return date
-        }
-        if let date = iso8601WithFractionalSeconds.date(from: dateStr) {
-          return date
-        }
-        throw DecodingError.dataCorruptedError(in: container,
-                                               debugDescription: "Expected ISO 8601 date: \(dateStr)")
-      })
-      return decoder
-    }
     let iso8601 = ISO8601DateFormatter()
     let iso8601WithFractionalSeconds = ISO8601DateFormatter()
     iso8601WithFractionalSeconds.formatOptions = [.withFractionalSeconds]
@@ -343,7 +318,7 @@ class OpenSubClient {
   }
 
   /// [Logout](https://opensubtitles.stoplight.io/docs/opensubtitles-api/9fe4d6d078e50-logout) method.
-  /// - Parameter timeout: The timeout to to use for the the request.
+  /// - Parameter timeout: The timeout to to use for the request.
   /// - Returns: A `LogoutResponse`
   func logout(timeout: TimeInterval? = nil) -> Promise<LogoutResponse> {
     return after(seconds: rateLimiter.delayBeforeCall()).then { [self] in
@@ -805,9 +780,7 @@ class OpenSubClient {
       var comments: String?
 #endif
       var downloadCount: Int
-#if DEBUG
       var featureDetails: SubtitleFeatureDetails
-#endif
       var files: [SubtitleFile]
 #if DEBUG
       var foreignPartsOnly: Bool?

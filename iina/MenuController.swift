@@ -86,6 +86,7 @@ class MenuController: NSObject, NSMenuDelegate {
   @IBOutlet weak var openURL: NSMenuItem!
   @IBOutlet weak var openURLAlternative: NSMenuItem!
   @IBOutlet weak var savePlaylist: NSMenuItem!
+  @IBOutlet weak var showCurrentFileInFinder: NSMenuItem!
   @IBOutlet weak var deleteCurrentFile: NSMenuItem!
   @IBOutlet weak var newWindow: NSMenuItem!
   @IBOutlet weak var newWindowSeparator: NSMenuItem!
@@ -153,6 +154,7 @@ class MenuController: NSObject, NSMenuDelegate {
   @IBOutlet weak var quickSettingsAudio: NSMenuItem!
   @IBOutlet weak var cycleAudioTracks: NSMenuItem!
   @IBOutlet weak var audioTrackMenu: NSMenu!
+  @IBOutlet weak var loadExternalAudio: NSMenuItem!
   @IBOutlet weak var volumeIndicator: NSMenuItem!
   @IBOutlet weak var increaseVolume: NSMenuItem!
   @IBOutlet weak var increaseVolumeSlightly: NSMenuItem!
@@ -171,6 +173,8 @@ class MenuController: NSObject, NSMenuDelegate {
   // Subtitle
   @IBOutlet weak var subMenu: NSMenu!
   @IBOutlet weak var quickSettingsSub: NSMenuItem!
+  @IBOutlet weak var hideSubtitles: NSMenuItem!
+  @IBOutlet weak var hideSecondSubtitles: NSMenuItem!
   @IBOutlet weak var cycleSubtitles: NSMenuItem!
   @IBOutlet weak var subTrackMenu: NSMenu!
   @IBOutlet weak var secondSubTrackMenu: NSMenu!
@@ -218,6 +222,7 @@ class MenuController: NSObject, NSMenuDelegate {
     stringForOpenURLAlternative = openURLAlternative.title
 
     savePlaylist.action = #selector(MainMenuActionHandler.menuSavePlaylist(_:))
+    showCurrentFileInFinder.action = #selector(MainMenuActionHandler.menuShowCurrentFileInFinder(_:))
     deleteCurrentFile.action = #selector(MainMenuActionHandler.menuDeleteCurrentFile(_:))
 
     if Preference.bool(for: .enableCmdN) {
@@ -282,11 +287,7 @@ class MenuController: NSObject, NSMenuDelegate {
 
     // -- screen
     fullScreen.action = #selector(MainWindowController.menuToggleFullScreen(_:))
-    if #available(macOS 10.12, *) {
-      pictureInPicture.action = #selector(MainWindowController.menuTogglePIP(_:))
-    } else {
-      videoMenu.removeItem(pictureInPicture)
-    }
+    pictureInPicture.action = #selector(MainWindowController.menuTogglePIP(_:))
     alwaysOnTop.action = #selector(MainWindowController.menuAlwaysOnTop(_:))
 
     // -- aspect
@@ -343,6 +344,7 @@ class MenuController: NSObject, NSMenuDelegate {
     audioMenu.delegate = self
     quickSettingsAudio.action = #selector(MainWindowController.menuShowAudioQuickSettings(_:))
     audioTrackMenu.delegate = self
+    loadExternalAudio.action = #selector(MainMenuActionHandler.menuLoadExternalAudio(_:))
 
     // - volume
     [increaseVolume, decreaseVolume, increaseVolumeSlightly, decreaseVolumeSlightly].forEach { item in
@@ -372,6 +374,8 @@ class MenuController: NSObject, NSMenuDelegate {
     quickSettingsSub.action = #selector(MainWindowController.menuShowSubQuickSettings(_:))
     loadExternalSub.action = #selector(MainMenuActionHandler.menuLoadExternalSub(_:))
     subTrackMenu.delegate = self
+    hideSubtitles.action = #selector(MainMenuActionHandler.menuToggleSubVisibility(_:))
+    hideSecondSubtitles.action = #selector(MainMenuActionHandler.menuToggleSecondSubVisibility(_:))
     secondSubTrackMenu.delegate = self
 
     findOnlineSub.action = #selector(MainMenuActionHandler.menuFindOnlineSub(_:))
@@ -410,11 +414,7 @@ class MenuController: NSObject, NSMenuDelegate {
 
     // Window
 
-    if #available(macOS 10.12.2, *) {
-      customTouchBar.action = #selector(NSApplication.toggleTouchBarCustomizationPalette(_:))
-    } else {
-      customTouchBar.isHidden = true
-    }
+    customTouchBar.action = #selector(NSApplication.toggleTouchBarCustomizationPalette(_:))
 
     inspector.action = #selector(MainMenuActionHandler.menuShowInspector(_:))
     miniPlayer.action = #selector(MainWindowController.menuSwitchToMiniPlayer(_:))
@@ -482,7 +482,7 @@ class MenuController: NSObject, NSMenuDelegate {
     let isDisplayingChapters = player.mainWindow.sideBarStatus == .playlist &&
           player.mainWindow.playlistView.currentTab == .chapters
     chapterPanel?.title = isDisplayingChapters ? Constants.String.hideChaptersPanel : Constants.String.chaptersPanel
-    pause.title = player.info.isPaused ? Constants.String.resume : Constants.String.pause
+    pause.title = player.info.state == .paused ? Constants.String.resume : Constants.String.pause
     abLoop.state = player.isABLoopActive ? .on : .off
     let loopMode = player.getLoopMode()
     fileLoop.state = loopMode == .file ? .on : .off
@@ -549,6 +549,10 @@ class MenuController: NSObject, NSMenuDelegate {
           player.mainWindow.quickSettingView.currentTab == .sub
     quickSettingsSub?.title = isDisplayingSettings ? Constants.String.hideSubtitlesPanel :
         Constants.String.subtitlesPanel
+    hideSubtitles.title = player.info.isSubVisible ? Constants.String.hideSubtitles :
+        Constants.String.showSubtitles
+    hideSecondSubtitles.title = player.info.isSecondSubVisible ? Constants.String.hideSecondSubtitles :
+        Constants.String.showSecondSubtitles
     subDelayIndicator.title = String(format: NSLocalizedString("menu.sub_delay", comment: "Subtitle Delay:"), player.info.subDelay)
 
     let encodingCode = player.info.subEncoding ?? "auto"
@@ -633,10 +637,11 @@ class MenuController: NSObject, NSMenuDelegate {
         at: 0)
     }
 
+    pluginMenu.addItem(.separator())
     if #available(macOS 12.0, *) {
-      pluginMenu.addItem(.separator())
       pluginMenu.addItem(developerTool)
     }
+    pluginMenu.addItem(withTitle: "Reload all plugins", action: #selector(MainMenuActionHandler.reloadAllPlugins(_:)), keyEquivalent: "")
   }
 
   @discardableResult
@@ -814,20 +819,24 @@ class MenuController: NSObject, NSMenuDelegate {
   }
 
   func updateKeyEquivalentsFrom(_ keyBindings: [KeyMapping]) {
-    var settings: [(NSMenuItem, Bool, [String], Bool, ClosedRange<Double>?, String?)] = [
-      (deleteCurrentFile, true, ["delete-current-file"], false, nil, nil),
-      (savePlaylist, true, ["save-playlist"], false, nil, nil),
-      (quickSettingsVideo, true, ["video-panel"], false, nil, nil),
-      (quickSettingsAudio, true, ["audio-panel"], false, nil, nil),
-      (quickSettingsSub, true, ["sub-panel"], false, nil, nil),
-      (playlistPanel, true, ["playlist-panel"], false, nil, nil),
-      (chapterPanel, true, ["chapter-panel"], false, nil, nil),
-      (findOnlineSub, true, ["find-online-subs"], false, nil, nil),
-      (saveDownloadedSub, true, ["save-downloaded-sub"], false, nil, nil),
-      (biggerSize, true, ["bigger-window"], false, nil, nil),
-      (smallerSize, true, ["smaller-window"], false, nil, nil),
-      (fitToScreen, true, ["fit-to-screen"], false, nil, nil),
-      (miniPlayer, true, ["toggle-music-mode"], false, nil, nil),
+    let settings: [(NSMenuItem, Bool, [String], Bool, ClosedRange<Double>?, String?)] = [
+      (showCurrentFileInFinder, true, [IINACommand.showCurrentFileInFinder.rawValue], false, nil, nil),
+      (deleteCurrentFile, true, [IINACommand.deleteCurrentFile.rawValue], false, nil, nil),
+      (savePlaylist, true, [IINACommand.saveCurrentPlaylist.rawValue], false, nil, nil),
+      (quickSettingsVideo, true, [IINACommand.videoPanel.rawValue], false, nil, nil),
+      (quickSettingsAudio, true, [IINACommand.audioPanel.rawValue], false, nil, nil),
+      (quickSettingsSub, true, [IINACommand.subPanel.rawValue], false, nil, nil),
+      (playlistPanel, true, [IINACommand.playlistPanel.rawValue], false, nil, nil),
+      (chapterPanel, true, [IINACommand.chapterPanel.rawValue], false, nil, nil),
+      (findOnlineSub, true, [IINACommand.findOnlineSubs.rawValue], false, nil, nil),
+      (saveDownloadedSub, true, [IINACommand.saveDownloadedSub.rawValue], false, nil, nil),
+      (flip, true, [IINACommand.flip.rawValue], false, nil, nil),
+      (mirror, true, [IINACommand.mirror.rawValue], false, nil, nil),
+      (biggerSize, true, [IINACommand.biggerWindow.rawValue], false, nil, nil),
+      (smallerSize, true, [IINACommand.smallerWindow.rawValue], false, nil, nil),
+      (fitToScreen, true, [IINACommand.fitToScreen.rawValue], false, nil, nil),
+      (miniPlayer, true, [IINACommand.toggleMusicMode.rawValue], false, nil, nil),
+      (pictureInPicture, true, [IINACommand.togglePIP.rawValue], false, nil, nil),
       (cycleVideoTracks, false, ["cycle", "video"], false, nil, nil),
       (cycleAudioTracks, false, ["cycle", "audio"], false, nil, nil),
       (cycleSubtitles, false, ["cycle", "sub"], false, nil, nil),
@@ -864,6 +873,8 @@ class MenuController: NSObject, NSMenuDelegate {
       (increaseAudioDelay, false, ["add", "audio-delay", "0.5"], true, nil, "audio_delay_up"),
       (increaseAudioDelaySlightly, false, ["add", "audio-delay", "0.1"], true, nil, "audio_delay_up"),
       (resetAudioDelay, false, ["set", "audio-delay", "0"], true, nil, nil),
+      (hideSubtitles, false, ["cycle", "sub-visibility"], false, nil, nil),
+      (hideSecondSubtitles, false, ["cycle", "secondary-sub-visibility"], false, nil, nil),
       (decreaseSubDelay, false, ["add", "sub-delay", "-0.5"], true, nil, "sub_delay_down"),
       (decreaseSubDelaySlightly, false, ["add", "sub-delay", "-0.1"], true, nil, "sub_delay_down"),
       (increaseSubDelay, false, ["add", "sub-delay", "0.5"], true, nil, "sub_delay_up"),
@@ -873,12 +884,8 @@ class MenuController: NSObject, NSMenuDelegate {
       (decreaseTextSize, false, ["multiply", "sub-scale", "0.9"], true, 0.71...0.99, nil),
       (resetTextSize, false, ["set", "sub-scale", "1"], true, nil, nil),
       (alwaysOnTop, false, ["cycle", "ontop"], false, nil, nil),
-      (fullScreen, false, ["cycle", "fullscreen"], false, nil, nil)
+      (fullScreen, false, ["cycle", "fullscreen"], false, nil, nil),
     ]
-
-    if #available(macOS 10.12, *) {
-      settings.append((pictureInPicture, true, ["toggle-pip"], false, nil, nil))
-    }
 
     var otherActionsMenuItems: [NSMenuItem] = []
 

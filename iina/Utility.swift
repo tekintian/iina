@@ -16,7 +16,7 @@ class Utility {
   static let supportedFileExt: [MPVTrack.TrackType: [String]] = [
     .video: ["mkv", "mp4", "avi", "m4v", "mov", "3gp", "ts", "mts", "m2ts", "wmv", "flv", "f4v", "asf", "webm", "rm", "rmvb", "qt", "dv", "mpg", "mpeg", "mxf", "vob", "gif", "ogv", "ogm"],
     .audio: ["mp3", "aac", "mka", "dts", "flac", "ogg", "oga", "mogg", "m4a", "ac3", "opus", "wav", "wv", "aiff", "aif", "ape", "tta", "tak"],
-    .sub: ["utf", "utf8", "utf-8", "idx", "sub", "srt", "smi", "rt", "ssa", "aqt", "jss", "js", "ass", "mks", "vtt", "sup", "scc"]
+    .sub: ["utf", "utf8", "utf-8", "idx", "sub", "srt", "smi", "rt", "ssa", "aqt", "jss", "js", "ass", "mks", "vtt", "sup", "scc", "lrc"]
   ]
   static let playableFileExt = supportedFileExt[.video]! + supportedFileExt[.audio]!
   static let singleFilePlaylistExt = ["cue"]
@@ -25,26 +25,16 @@ class Utility {
   static let blacklistExt = supportedFileExt[.sub]! + multipleFilePlaylistExt
   static let lut3dExt = ["3dl", "cube", "dat", "m3d"]
 
-  // MARK: - Logs, alerts
-
-  @available(*, deprecated, message: "showAlert(message:alertStyle:) is deprecated, use showAlert(_ key:comment:arguments:alertStyle:) instead")
-  static func showAlert(message: String, alertStyle: NSAlert.Style = .critical) {
-    let alert = NSAlert()
-    switch alertStyle {
-    case .critical:
-      alert.messageText = NSLocalizedString("alert.title_error", comment: "Error")
-    case .informational:
-      alert.messageText = NSLocalizedString("alert.title_info", comment: "Information")
-    case .warning:
-      alert.messageText = NSLocalizedString("alert.title_warning", comment: "Warning")
-    @unknown default:
-      assertionFailure("Unknown \(type(of: alertStyle)) \(alertStyle)")
-    }
-    alert.informativeText = message
-    alert.alertStyle = alertStyle
-    alert.runModal()
+  enum ValidationResult {
+    case ok
+    case valueIsEmpty
+    case valueAlreadyExists
+    case custom(String)
   }
 
+  typealias InputValidator<T> = (T) -> ValidationResult
+
+  // MARK: - Logs, alerts
   static func showAlert(_ key: String, comment: String? = nil, arguments: [CVarArg]? = nil, style: NSAlert.Style = .critical, sheetWindow: NSWindow? = nil, suppressionKey: PK? = nil) {
     let alert = NSAlert()
     if let suppressionKey = suppressionKey {
@@ -226,33 +216,83 @@ class Utility {
    - Returns: Whether user dismissed the panel by clicking OK. Only works when using `.modal` mode.
    */
   @discardableResult
-  static func quickPromptPanel(_ key: String, titleComment: String? = nil, messageComment: String? = nil, inputValue: String? = nil, sheetWindow: NSWindow? = nil, callback: @escaping (String) -> Void) -> Bool {
+  static func quickPromptPanel(_ key: String, titleComment: String? = nil, messageComment: String? = nil,
+                               inputValue: String? = nil, validator: InputValidator<String>? = nil,
+                               sheetWindow: NSWindow? = nil, callback: @escaping (String) -> Void) -> Bool {
     let panel = NSAlert()
     let titleKey = "alert." + key + ".title"
     let messageKey = "alert." + key + ".message"
     panel.messageText = NSLocalizedString(titleKey, comment: titleComment ?? titleKey)
     panel.informativeText = NSLocalizedString(messageKey, comment: messageComment ?? messageKey)
-    let input = NSTextField(frame: NSRect(x: 0, y: 0, width: 240, height: 24))
+
+    // accessory view
+    let input = NSTextField(frame: NSRect(x: 0, y: 0, width: 240, height: 16))
+    input.translatesAutoresizingMaskIntoConstraints = false
     input.lineBreakMode = .byClipping
     input.usesSingleLineMode = true
     input.cell?.isScrollable = true
     if let inputValue = inputValue {
       input.stringValue = inputValue
     }
-    panel.accessoryView = input
-    panel.addButton(withTitle: NSLocalizedString("general.ok", comment: "OK"))
-    panel.addButton(withTitle: NSLocalizedString("general.cancel", comment: "Cancel"))
+    let stackView = NSStackView(frame: NSRect(x: 0, y: 0, width: 240, height: 20))
+    stackView.orientation = .vertical
+    stackView.alignment = .centerX
+    stackView.addArrangedSubview(input)
+
+    // buttons
+    let okButton = panel.addButton(withTitle: NSLocalizedString("general.ok", comment: "OK"))
+    let _ = panel.addButton(withTitle: NSLocalizedString("general.cancel", comment: "Cancel"))
     panel.window.initialFirstResponder = input
+
+    // validation
+    var observer: NSObjectProtocol?
+    if let validator = validator {
+      let label = NSTextField(labelWithString: "label")
+      label.textColor = .secondaryLabelColor
+      label.font = .systemFont(ofSize: NSFont.smallSystemFontSize)
+      stackView.addArrangedSubview(label)
+      stackView.frame = NSRect(x: 0, y: 0, width: 240, height: 42)
+
+      let validateInput = {
+        switch validator(input.stringValue) {
+        case .ok:
+          okButton.isEnabled = true
+          label.stringValue = ""
+        case .valueIsEmpty:
+          okButton.isEnabled = false
+          label.stringValue = NSLocalizedString("input.value_is_empty", comment: "Value is empty.")
+        case .valueAlreadyExists:
+          okButton.isEnabled = false
+          label.stringValue = NSLocalizedString("input.already_exists", comment: "Value already exists.")
+        case .custom(let message):
+          label.stringValue = message
+          okButton.isEnabled = false
+        }
+      }
+      observer = NotificationCenter.default.addObserver(forName: NSControl.textDidChangeNotification, object: input, queue: .main) { _ in
+        validateInput()
+      }
+      validateInput()
+    }
+
+    stackView.translatesAutoresizingMaskIntoConstraints = true
+    panel.accessoryView = stackView
 
     if let sheetWindow = sheetWindow {
       panel.beginSheetModal(for: sheetWindow) { response in
         if response == .alertFirstButtonReturn {
           callback(input.stringValue)
         }
+        if let observer = observer {
+          NotificationCenter.default.removeObserver(observer)
+        }
       }
     } else {
       if panel.runModal() == .alertFirstButtonReturn {
         callback(input.stringValue)
+        if let observer = observer {
+          NotificationCenter.default.removeObserver(observer)
+        }
         return true
       }
     }
@@ -318,7 +358,7 @@ class Utility {
      - callback: A closure accepting the font name.
    */
   static func quickFontPickerWindow(callback: @escaping (String?) -> Void) {
-    guard let appDelegate = NSApp.delegate as? AppDelegate else { return }
+    let appDelegate = AppDelegate.shared
     appDelegate.fontPicker.finishedPicking = callback
     appDelegate.fontPicker.showWindow(self)
   }
@@ -436,10 +476,6 @@ class Utility {
                                                 attributes: FontAttributes(font: active ? .systemBold : .system, size: .system, align: .center).value)
   }
 
-  static func toRealSubScale(fromDisplaySubScale scale: Double) -> Double {
-    return scale > 0 ? scale : -1 / scale
-  }
-
   static func toDisplaySubScale(fromRealSubScale realScale: Double) -> Double {
     return realScale >= 1 ? realScale : -1 / realScale
   }
@@ -471,20 +507,6 @@ class Utility {
       return VideoTime(progress)
     } else {
       return nil
-    }
-  }
-
-  @available(macOS, deprecated: 10.14, message: "Use the system appearance-based APIs instead.")
-  static func getAppearanceAndMaterial(from theme: Preference.Theme) -> (NSAppearance?, NSVisualEffectView.Material) {
-    switch theme {
-    case .ultraDark:
-      return (NSAppearance(named: .vibrantDark), .ultraDark)
-    case .light:
-      return (NSAppearance(named: .vibrantLight), .light)
-    case .mediumLight:
-      return (NSAppearance(named: .vibrantLight), .mediumLight)
-    default:
-      return (NSAppearance(named: .vibrantDark), .dark)
     }
   }
 
@@ -611,12 +633,9 @@ class Utility {
   static func resolveURLs(_ urls: [URL]) -> [URL] {
     return urls.map { (try? URL(resolvingAliasFileAt: $0)) ?? $0 }
   }
-
 }
 
 // http://stackoverflow.com/questions/33294620/
-
-
 func rawPointerOf<T : AnyObject>(obj : T) -> UnsafeRawPointer {
   return UnsafeRawPointer(Unmanaged.passUnretained(obj).toOpaque())
 }

@@ -16,6 +16,9 @@
 "general.username" = "उपयोगकर्ता नाम";
 "general.password" = "पारण शब्द";
 
+"input.value_is_empty" = "Value cannot be empty.";
+"input.already_exists" = "Value already exists.";
+
 // Guide Window
 "guide.highlights" = "Highlights";
 "guide.basic_settings" = "मार्गदर्शक. मूल_सेटिंग्स";
@@ -27,6 +30,9 @@
 "initial.nightly.desc" = "Nightly is not recommended to be used as daily drive. Currently nightly builds do not support auto update. Please manually download newer builds from our <a href=\"https://nightly.iina.io\">nightly website</a>.";
 "initial.debug.desc" = "Debug builds are usually not optimized for performance, so it is not recommended to be used as daily drive. Debug builds do not support auto update.";
 "initial.bug_report" = "Report via <a href=\"https://github.com/iina/iina/issues\">GitHub issues</a>.";
+
+// Inspector Window
+"inspector.error" = "त्रुटि";
 
 // MainWindowController.swift
 "main.buffering_indicator" = "बफरिंग… %d%%";
@@ -43,6 +49,36 @@
 "quicksetting.hwdec" = "Hardware Decoding";
 "quicksetting.deinterlace" = "असंग्रथित";
 "quicksetting.hdr" = "HDR";
+"quicksetting.hide" = "छिपाना";
+
+// EQ Presets
+"eq.preset.flat" = "Flat";
+"eq.preset.acoustic" = "Acoustic";
+"eq.preset.classical" = "Classical";
+"eq.preset.dance" = "Dance";
+"eq.preset.deep" = "Deep";
+"eq.preset.electronic" = "Electronic";
+"eq.preset.hip_hop" = "Hip Hop";
+"eq.preset.increase_bass" = "Increase Bass";
+"eq.preset.increase_treble" = "Increase Treble";
+"eq.preset.increase_vocal" = "Increase Vocal";
+"eq.preset.jazz" = "Jazz";
+"eq.preset.latin" = "Latin";
+"eq.preset.loundness" = "Loundness";
+"eq.preset.lounge" = "Lounge";
+"eq.preset.piano" = "Piano";
+"eq.preset.pop" = "Pop";
+"eq.preset.rnb" = "R&B";
+"eq.preset.reduce_bass" = "Reduce Bass";
+"eq.preset.reduce_treble" = "Reduce Treble";
+"eq.preset.rock" = "Rock";
+"eq.preset.small_speaker" = "Small Speaker";
+"eq.preset.spoken_word" = "Spoken Word";
+
+"alert.eq.new_profile.title" = "New EQ Profile";
+"alert.eq.new_profile.message" = "Please enter a profile name.";
+"alert.eq.rename.title" = "Rename Currnet Profile";
+"alert.eq.rename.message" = "Please enter a new profile name.";
 
 // OSDMessage.swift
 "osd.pause" = "रोकें";
@@ -61,6 +97,14 @@
 "osd.sub_delay.later" = "उपशीर्षक देरी: %.2fs बाद में";
 "osd.sub_delay.earlier" = "उपशीर्षक देरी: %.2fs पूर्व";
 "osd.subtitle_pos" = "उपशीर्षक पद: %.1f";
+"osd.sub_hidden" = "Subtitles Hidden";
+"osd.sub_visible" = "Subtitles Visible";
+"osd.sub_second_delay.nodelay" = "Secondary Subtitle Delay: No Delay";
+"osd.sub_second_delay.later" = "Secondary Subtitle Delay: %.2fs Later";
+"osd.sub_second_delay.earlier" = "Secondary Subtitle Delay: %.2fs Earlier";
+"osd.sub_second_hidden" = "Secondary Subtitles Hidden";
+"osd.sub_second_pos" = "Secondary Subtitle Position: %.1f";
+"osd.sub_second_visible" = "Secondary Subtitles Visible";
 "osd.mute" = "म्यूट";
 "osd.unmute" = "Unmute";
 "osd.screenshot" = "स्क्रीनशॉट कैप्चर किया गया";
@@ -80,7 +124,8 @@
 "osd.find_online_sub" = "ऑनलाइन उपशीर्षक ढूँढना…";
 "osd.find_online_sub.source" = "from";
 "osd.sub_not_found" = "कोई उपशीर्षक नहीं मिला";
-"osd.sub_found" = "%d  उपशीर्षक मिले। डाउनलोडिंग…";
+"osd.sub_found" = "%d subtitles found.";
+"osd.sub_downloading" = "Downloading %d subtitles";
 "osd.sub_downloaded" = "उपशीर्षक डाउनलोड किया गया";
 "osd.sub_saved" = "उपशीर्षक सहेजा गया";
 "osd.network_error" = "नेटवर्क त्रुटि";
@@ -116,10 +161,26 @@
 
 "preference.enable_adv_settings" = "उन्नत सेटिंग्स सक्षम करें";
 
+"preference.sub_override_level.no" = "no";
+"preference.sub_override_level.force" = "force";
+"preference.sub_override_level.scale" = "scale";
+"preference.sub_override_level.strip" = "स्ट्रिप";
+"preference.sub_override_level.yes" = "yes";
+
+"preference.sub_override_level.descriptive_text.no" = "Render subtitles as specified by the subtitle scripts, without overrides.";
+"preference.sub_override_level.descriptive_text.force" = "Apply all subtitle styles.";
+"preference.sub_override_level.descriptive_text.scale" = "Apply the scale setting in addition to the style settings in this section.";
+"preference.sub_override_level.descriptive_text.strip" = "Radically strip all ASS tags and styles from the subtitle.";
+"preference.sub_override_level.descriptive_text.yes" = "Apply all the style settings in this section.";
+
 "menu.volume" = "ध्वनि: %d";
 "menu.volume_muted" = "Volume: %d (Muted)";
 "menu.audio_delay" = "ऑडियो विलंब: %.2fs";
 "menu.sub_delay" = "उपशीर्षक देरी: %.2fs";
+"menu.sub_hide" = "Hide Subtitles";
+"menu.sub_show" = "Show Subtitles";
+"menu.sub_second_hide" = "Hide Secondary Subtitles";
+"menu.sub_second_show" = "Show Secondary Subtitles";
 "menu.fullscreen" = "पूर्ण स्क्रीन दर्ज करें";
 "menu.exit_fullscreen" = "पूर्ण स्क्रीन से बाहर निकलें";
 "menu.pip" = "पिक्चर-इन-पिक्चर डालें";
@@ -151,10 +212,13 @@
 "menu.sub_delay_up" = "उपशीर्षक देरी + %.1fs";
 "menu.sub_delay_down" = "उपशीर्षक देरी - %.1fs";
 
-"menu.crop_custom" = "कस्टम...";
+"menu.crop_custom" = "कस्टम…";
 "menu.find_online_sub" = "Find Online Subtitles from %@";
 
+"track.audio" = "ऑडियो";
 "track.none" = "<कोई नहीं>";
+"track.sub" = "उपशीर्षक";
+"track.video" = "वीडियो";
 
 "subtrack.no_loaded" = "कोई उपशीर्षक लोड नहीं हुआ";
 "subtrack.no_external" = "कोई बाहरी उपशीर्षक नहीं मिला";
@@ -168,7 +232,6 @@
 
 "alert.fatal_error" = "घातक त्रुटि: %@ \n एप्लिकेशन अब बाहर निकल जाएगा।";
 "alert.mpv_error" = "आंतरिक गलती %@ (%@) विकल्प सेट करते समय %@।";
-"alert.sleep" = "Cannot prevent display sleep! (0x%0X8)";
 
 "alert.unsupported_audio" = "असमर्थित बाहरी ऑडियो फ़ाइल।";
 "alert.unsupported_sub" = "असमर्थित बाहरी उपशीर्षक।";
@@ -186,11 +249,13 @@
 "alert.config.duplicate.title" = "डुप्लिकेट कॉन्फ़िगरेशन";
 "alert.config.duplicate.message" = "कृपया डुप्लिकेट कॉन्फ़िगरेशन फ़ाइल के लिए नाम दर्ज करें।";
 "alert.config.empty_name" = "नाम खाली नहीं हो सकता।";
-"alert.config.name_existing" = "नाम पहले से मौजूद है।";
+"alert.config.name_existing" = "A config with the same name already exists.";
 "alert.config.file_existing.title" = "फ़ाइल पहले से ही मौजूद है";
-"alert.config.file_existing.message" = "ऐसा न हो कि। अधिलेखित करने के लिए ठीक चुनें, फ़ाइल को खोजक में प्रकट करने के लिए रद्द करें।";
+"alert.config.file_existing.message" = "A config file with the same filename already exists. Choose OK to show the file in Finder.";
 "alert.config.cannot_create" = "कॉन्फ़िगरेशन फ़ाइल नहीं बना सकता है!\n%@";
 "alert.config.cannot_write" = "फ़ाइल को कॉन्फ़िगर करने के लिए नहीं लिख सकता!";
+"alert.config.rename.title" = "Rename Input Configuration";
+"alert.config.rename.message" = "Please enter the new name for the configuration.";
 
 "alert.filter.incorrect" = "फ़िल्टर सेट करते समय त्रुटि आई। कृपया अपना पैरामीटर प्रारूप जांचें।";
 "alert.add_filter.title" = "नया फ़िल्टर";

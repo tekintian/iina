@@ -105,14 +105,16 @@ class JavascriptAPICore: JavascriptAPI, JavascriptAPICoreExportable {
   }
 
   func getHistory() -> Any {
-    return HistoryController.shared.history.map {
-      [
-        "name": $0.name,
-        "url": $0.url.absoluteString,
-        "date": $0.addedDate,
-        "progress": $0.mpvProgress?.second ?? NSNull(),
-        "duration": $0.duration.second
-      ] as [String: Any]
+    HistoryController.shared.$history.withLock {
+      $0.map {
+        [
+          "name": $0.name,
+          "url": $0.url.absoluteString,
+          "date": $0.addedDate,
+          "progress": $0.mpvProgress?.second ?? NSNull(),
+          "duration": $0.duration.second
+        ] as [String: Any]
+      }
     }
   }
 
@@ -130,7 +132,7 @@ class JavascriptAPICore: JavascriptAPI, JavascriptAPICoreExportable {
     return [
       "iina": iinaVersion,
       "build": build,
-      "mpv": PlayerCore.first.mpv.mpvVersion
+      "mpv": player!.mpv.mpvVersion
     ]
   }
 }
@@ -272,13 +274,11 @@ fileprivate class WindowAPI: JavascriptAPI, CoreSubAPIExportable {
       guard let val = value as? Bool, val != window.fsState.isFullscreen else { return }
       window.toggleWindowFullScreen()
     case "pip":
-      if #available(macOS 10.12, *) {
-        guard let val = value as? Bool else { return }
-        if val {
-          window.enterPIP()
-        } else {
-          window.exitPIP()
-        }
+      guard let val = value as? Bool else { return }
+      if val {
+        window.enterPIP()
+      } else {
+        window.exitPIP()
       }
     case "ontop":
       guard let val = value as? Bool else { return }
@@ -307,9 +307,9 @@ fileprivate class StatusAPI: JavascriptAPI, CoreSubAPIExportable {
   func __proxyGet(_ prop: String) -> Any? {
     switch prop {
     case "paused":
-      return !player!.info.isPlaying
+      return player!.info.state == .paused
     case "idle":
-      return player!.info.isIdle
+      return player!.info.state == .idle
     case "position":
       return player!.info.videoPosition?.second ?? NSNull()
     case "duration":
