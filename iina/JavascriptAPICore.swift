@@ -132,7 +132,7 @@ class JavascriptAPICore: JavascriptAPI, JavascriptAPICoreExportable {
     return [
       "iina": iinaVersion,
       "build": build,
-      "mpv": player!.mpv.mpvVersion
+      "mpv": MPVOptionDefaults.shared.mpvVersion
     ]
   }
 }
@@ -143,7 +143,7 @@ fileprivate func serialize(track: MPVTrack) -> [String: Any] {
   return [
     "id": track.id,
     "title": track.title ?? NSNull(),
-    "formattedTitie": track.readableTitle,
+    "formattedTitle": track.readableTitle,
     "lang": track.lang ?? NSNull(),
     "codec": track.codec ?? NSNull(),
     "isDefault": track.isDefault,
@@ -252,6 +252,8 @@ fileprivate class WindowAPI: JavascriptAPI, CoreSubAPIExportable {
         return ["frame": frame, "main": screen == main, "current": screen == current]
       }
       return screens
+    case "miniaturized":
+      return window.window!.isMiniaturized
     default:
       return nil
     }
@@ -294,6 +296,13 @@ fileprivate class WindowAPI: JavascriptAPI, CoreSubAPIExportable {
         }
       } else {
         window.hideSideBar(animate: true)
+      }
+    case "miniaturized":
+      guard let val = value as? Bool else { return }
+      if val {
+        window.window!.miniaturize(self)
+      } else {
+        window.window!.deminiaturize(self)
       }
     default:
       log("core.window: \(prop) is not accessible", level: .warning)

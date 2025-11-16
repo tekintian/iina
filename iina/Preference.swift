@@ -59,7 +59,6 @@ struct Preference {
     static let fullScreenWhenOpen = Key("fullScreenWhenOpen")
 
     static let useLegacyFullScreen = Key("useLegacyFullScreen")
-    static let legacyFullScreenAnimation = Key("legacyFullScreenAnimation")
 
     /** Black out other monitors while fullscreen (bool) */
     static let blackOutMonitor = Key("blackOutMonitor")
@@ -139,6 +138,8 @@ struct Preference {
     static let resizeWindowOption = Key("resizeWindowOption")
 
     static let oscPosition = Key("oscPosition")
+    static let disablePlaySliderScrolling = Key("disablePlaySliderScrolling")
+    static let disableVolumeSliderScrolling = Key("disableVolumeSliderScrolling")
 
     static let playlistWidth = Key("playlistWidth")
     static let prefetchPlaylistVideoDuration = Key("prefetchPlaylistVideoDuration")
@@ -157,6 +158,7 @@ struct Preference {
     static let windowBehaviorWhenPip = Key("windowBehaviorWhenPip")
     static let pauseWhenPip = Key("pauseWhenPip")
     static let togglePipByMinimizingWindow = Key("togglePipByMinimizingWindow")
+    static let togglePipByMinimizingWindowForVideoOnly = Key("togglePipByMinimizingWindowForVideoOnly")
 
     static let disableAnimations = Key("disableAnimations")
 
@@ -190,6 +192,8 @@ struct Preference {
     static let replayGainPreamp = Key("replayGainPreamp")
     static let replayGainClip = Key("replayGainClip")
     static let replayGainFallback = Key("replayGainFallback")
+
+    static let gaplessAudio = Key("gaplessAudio")
 
     static let userEQPresets = Key("userEQPresets")
 
@@ -235,6 +239,8 @@ struct Preference {
     static let defaultCacheSize = Key("defaultCacheSize")
     static let cacheBufferSize = Key("cacheBufferSize")
     static let secPrefech = Key("secPrefech")
+    static let showBufferingThrobber = Key("showBufferingThrobber")
+    static let showSeekingThrobber = Key("showSeekingThrobber")
     static let userAgent = Key("userAgent")
     static let transportRTSPThrough = Key("transportRTSPThrough")
     static let ytdlEnabled = Key("ytdlEnabled")
@@ -253,6 +259,7 @@ struct Preference {
     static let arrowButtonAction = Key("arrowBtnAction")
     /** (1~4) */
     static let volumeScrollAmount = Key("volumeScrollAmount")
+    static let playbackSpeedScrollAmount = Key("playbackSpeedScrollAmount")
     static let verticalScrollAction = Key("verticalScrollAction")
     static let horizontalScrollAction = Key("horizontalScrollAction")
 
@@ -265,6 +272,7 @@ struct Preference {
     static let forceTouchAction = Key("forceTouchAction")
 
     static let showRemainingTime = Key("showRemainingTime")
+    static let scaleRemainingTime = Key("scaleRemainingTime")
     static let timeDisplayPrecision = Key("timeDisplayPrecision")
     static let touchbarShowRemainingTime = Key("touchbarShowRemainingTime")
 
@@ -328,6 +336,17 @@ struct Preference {
     /// To confirm this the workaround is being disabled by default using this preference. Should all go well this workaround will be
     /// removed in the future.
     static let enableHdrWorkaround = Key("enableHdrWorkaround")
+
+    /// Internal setting to allow disabling the new feature that shows cover artwork in the Now Playing module in case a serious
+    /// problem is encountered.
+    static let enableNowPlayingArtwork = Key("enableNowPlayingArtwork")
+
+    /// Internal setting to allow disabling the feature that detects when a display is idle and shuts down the display link to save energy
+    /// in case a problem is found where the display link is shut down when it is needed.
+    static let enableDisplayIdle = Key("enableDisplayIdle")
+
+    /// Workaround for AppKit defect where showWindow moves the window to a different screen (fixed as of macOS Tahoe).
+    static let enableWrongScreenWorkaround = Key("enableWrongScreenWorkaround")
   }
 
   // MARK: - Enums
@@ -404,6 +423,8 @@ struct Preference {
     case pause
     case hideOSC
     case togglePIP
+    case abLoop
+    case resetSpeed
 
     static var defaultValue = MouseClickAction.none
 
@@ -417,6 +438,7 @@ struct Preference {
     case seek
     case none
     case passToMpv
+    case playbackSpeed
 
     static var defaultValue = ScrollAction.volume
 
@@ -493,7 +515,7 @@ struct Preference {
     case scale
     case no
 
-    static var defaultValue = SubOverrideLevel.yes
+    static var defaultValue = SubOverrideLevel.scale
 
     init?(key: Key) {
       self.init(rawValue: Preference.integer(for: key))
@@ -704,6 +726,7 @@ struct Preference {
     case musicMode
     case subTrack
     case screenshot
+    case plugins
 
     func image() -> NSImage {
       func makeSymbol(_ names: [String], _ fallbackImage: NSImage.Name) -> NSImage {
@@ -713,12 +736,13 @@ struct Preference {
       }
       switch self {
       case .settings: return makeSymbol(["gearshape"], NSImage.actionTemplateName)
-      case .playlist: return makeSymbol(["list.bullet"], "playlist")
+      case .playlist: return makeSymbol(["list.bullet.rectangle", "list.bullet"], "playlist")
       case .pip: return makeSymbol(["pip.swap"], "pip")
       case .fullScreen: return makeSymbol(["arrow.up.backward.and.arrow.down.forward.rectangle", "arrow.up.left.and.arrow.down.right"], "fullscreen")
-      case .musicMode: return makeSymbol(["music.note.list"], "toggle-album-art")
+      case .musicMode: return makeSymbol(["music.microphone", "music.mic"], "toggle-album-art")
       case .subTrack: return makeSymbol(["captions.bubble.fill"], "sub-track")
       case .screenshot: return makeSymbol(["camera.shutter.button"], "screenshot")
+      case .plugins: return makeSymbol(["puzzlepiece.extension"], "plugin")
       }
     }
 
@@ -732,6 +756,7 @@ struct Preference {
       case .musicMode: key = "music_mode"
       case .subTrack: key = "sub_track"
       case .screenshot: key = "screenshot"
+      case .plugins: key = "plugins"
       }
       return NSLocalizedString("osc_toolbar.\(key)", comment: key)
     }
@@ -765,6 +790,32 @@ struct Preference {
     }
   }
 
+  enum GaplessAudioOption: Int, InitializingFromKey {
+    case disabled = 0
+    case weak
+    case strong
+
+    static var defaultValue = GaplessAudioOption.weak
+
+    init?(key: Key) {
+      self.init(rawValue: Preference.integer(for: key))
+    }
+
+    var localizedDescription: String {
+      return NSLocalizedString("gaplessAudio." + mpvString, comment: mpvString)
+    }
+
+    var mpvString: String {
+      get {
+        switch self {
+        case .disabled: return "no"
+        case .weak : return "weak"
+        case .strong: return "yes"
+        }
+      }
+    }
+  }
+
   enum DefaultRepeatMode: Int {
     case playlist = 0
     case file
@@ -785,8 +836,10 @@ struct Preference {
     .controlBarStickToCenter: true,
     .controlBarAutoHideTimeout: Float(2.5),
     .enableControlBarAutoHide: true,
-    .controlBarToolbarButtons: [ToolBarButton.pip.rawValue, ToolBarButton.playlist.rawValue, ToolBarButton.settings.rawValue],
+    .controlBarToolbarButtons: [ToolBarButton.plugins.rawValue, ToolBarButton.pip.rawValue, ToolBarButton.playlist.rawValue, ToolBarButton.settings.rawValue],
     .oscPosition: OSCPosition.floating.rawValue,
+    .disablePlaySliderScrolling: false,
+    .disableVolumeSliderScrolling: false,
     .playlistWidth: 270,
     .prefetchPlaylistVideoDuration: true,
     .themeMaterial: Theme.dark.rawValue,
@@ -802,7 +855,6 @@ struct Preference {
     .pauseWhenOpen: false,
     .fullScreenWhenOpen: false,
     .useLegacyFullScreen: false,
-    .legacyFullScreenAnimation: false,
     .showChapterPos: false,
     .resumeLastPosition: true,
     .preventScreenSaver: true,
@@ -831,6 +883,7 @@ struct Preference {
     .resizeWindowTiming: ResizeWindowTiming.onlyWhenOpen.rawValue,
     .resizeWindowOption: ResizeWindowOption.videoSize10.rawValue,
     .showRemainingTime: false,
+    .scaleRemainingTime: false,
     .timeDisplayPrecision: 0,
     .touchbarShowRemainingTime: true,
     .enableThumbnailPreview: true,
@@ -845,6 +898,7 @@ struct Preference {
     .windowBehaviorWhenPip: WindowBehaviorWhenPip.doNothing.rawValue,
     .pauseWhenPip: false,
     .togglePipByMinimizingWindow: false,
+    .togglePipByMinimizingWindowForVideoOnly: false,
     .disableAnimations: false,
 
     .videoThreads: 0,
@@ -870,13 +924,14 @@ struct Preference {
     .replayGainPreamp: 0,
     .replayGainClip: false,
     .replayGainFallback: 0,
+    .gaplessAudio: GaplessAudioOption.weak.rawValue,
 
     .subAutoLoadIINA: IINAAutoLoadAction.iina.rawValue,
     .subAutoLoadPriorityString: "",
     .subAutoLoadSearchPath: "./*",
     .ignoreAssStyles: false,
-    .subOverrideLevel: SubOverrideLevel.strip.rawValue,
-    .secondarySubOverrideLevel: SubOverrideLevel.strip.rawValue,
+    .subOverrideLevel: SubOverrideLevel.scale.rawValue,
+    .secondarySubOverrideLevel: SubOverrideLevel.scale.rawValue,
     .subTextFont: "sans-serif",
     .subTextSize: Float(55),
     .subTextColorString: NSColor.white.usingColorSpace(.deviceRGB)!.mpvColorString,
@@ -909,6 +964,8 @@ struct Preference {
     .defaultCacheSize: 153600,
     .cacheBufferSize: 153600,
     .secPrefech: 36000,
+    .showBufferingThrobber: true,
+    .showSeekingThrobber: true,
     .userAgent: "",
     .transportRTSPThrough: RTSPTransportation.tcp.rawValue,
     .ytdlEnabled: true,
@@ -934,6 +991,7 @@ struct Preference {
     .followGlobalSeekTypeWhenAdjustSlider: false,
     .relativeSeekAmount: 3,
     .volumeScrollAmount: 3,
+    .playbackSpeedScrollAmount: 3,
     .verticalScrollAction: ScrollAction.volume.rawValue,
     .horizontalScrollAction: ScrollAction.seek.rawValue,
     .videoViewAcceptsFirstMouse: false,
@@ -960,7 +1018,10 @@ struct Preference {
     .recentDocuments: [Any](),
 
     .enableFFmpegImageDecoder: true,
-    .enableHdrWorkaround: false
+    .enableHdrWorkaround: false,
+    .enableNowPlayingArtwork: true,
+    .enableDisplayIdle: true,
+    .enableWrongScreenWorkaround: true
   ]
 
 

@@ -269,7 +269,7 @@
 "UOE-MJ-8ku.title" = "إيقاف مؤقت";
 
 /* Class = "NSMenu"; title = "Secondary Subtitle"; ObjectID = "UwY-P2-Xdb"; */
-"UwY-P2-Xdb.title" = "Secondary Subtitle";
+"UwY-P2-Xdb.title" = "الترجمة الثانوية";
 
 /* Class = "NSMenuItem"; title = "Redo"; ObjectID = "VDZ-ro-z5z"; */
 "VDZ-ro-z5z.title" = "تراجع";
@@ -325,6 +325,9 @@
 /* Class = "NSMenuItem"; title = "Inspector"; ObjectID = "bwz-r0-peR"; */
 "bwz-r0-peR.title" = "الفاحص";
 
+/* Class = "NSMenuItem"; title = "Log Viewer"; ObjectID = "0tJ-RQ-kuW"; */
+"0tJ-RQ-kuW.title" = "عارض السجل";
+
 /* Class = "NSMenuItem"; title = "Normal Size (Retina)"; ObjectID = "c1x-bx-69F"; */
 "c1x-bx-69F.title" = "الحجم العادي (ريتين)";
 
@@ -332,7 +335,7 @@
 "c6Y-0e-vgf.title" = "مستوى الصوت +";
 
 /* Class = "NSMenuItem"; title = "Show Current File in Finder"; ObjectID = "che-dy-QUU"; */
-"che-dy-QUU.title" = "Show Current File in Finder";
+"che-dy-QUU.title" = "إظهار الملف الحالي في الباحث";
 
 /* Class = "NSMenuItem"; title = "Aspect Ratio"; ObjectID = "d15-8v-dXA"; */
 "d15-8v-dXA.title" = "نسبة الارتفاع إلى العرض";
@@ -398,7 +401,7 @@
 "m7w-hc-Y2F.title" = "أجعل الأحرف الكبيرة";
 
 /* Class = "NSMenuItem"; title = "Secondary Subtitle"; ObjectID = "mGw-jm-5x2"; */
-"mGw-jm-5x2.title" = "Secondary Subtitle";
+"mGw-jm-5x2.title" = "الترجمة الثانوية";
 
 /* Class = "NSMenuItem"; title = "Enter Picture in Picture"; ObjectID = "mND-N8-z6o"; */
 "mND-N8-z6o.title" = "أدخل صورة في صورة";
@@ -407,7 +410,7 @@
 "mT1-1m-HwN.title" = "قلب";
 
 /* Class = "NSMenuItem"; title = "Cycle Audio Tracks"; ObjectID = "n8f-ub-Udb"; */
-"n8f-ub-Udb.title" = "Cycle Audio Tracks";
+"n8f-ub-Udb.title" = "مسارات الفيديو الدورية";
 
 /* Class = "NSMenu"; title = "Flip"; ObjectID = "n90-to-nRT"; */
 "n90-to-nRT.title" = "قلب";
@@ -501,3 +504,9 @@
 
 /* Class = "NSMenuItem"; title = "Start Speaking"; ObjectID = "zpw-Ac-F3M"; */
 "zpw-Ac-F3M.title" = "أبدء الحديث";
+
+/* Class = "NSMenuItem"; title = "Plugin"; ObjectID = "Y6q-cI-vfM"; */
+"Y6q-cI-vfM.title" = "الإضافات";
+
+/* Class = "NSMenuItem"; title = "Open URL…"; ObjectID = "Qwb-26-zjX"; */
+"Qwb-26-zjX.title" = "فتح الرابط…";

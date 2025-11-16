@@ -84,7 +84,7 @@
 "opt.window-scale" = "윈도우 크기";
 
 "opt.video" = "비디오 트랙";
-"opt.video-aspect" = "비디오 화면비";
+"opt.video-aspect-override" = "비디오 화면비";
 "opt.contrast" = "대비";
 "opt.brightness" = "밝기";
 "opt.gamma" = "감마";
@@ -101,7 +101,7 @@
 "opt.sub-pos" = "자막 위치";
 "opt.sub-scale" = "자막 크기";
 "opt.sub-visibility" = "자막 보이기";
-"opt.secondary-sub-visibility" = "Secondary subtitle visibility";
+"opt.secondary-sub-visibility" = "부자막 투명도";
 "opt.sub-ass-style-override" = "ASS 자막 효과 덮어쓰기";
 
 "opt.fullscreen" = "전체 화면";

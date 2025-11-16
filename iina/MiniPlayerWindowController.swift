@@ -64,6 +64,10 @@ class MiniPlayerWindowController: PlayerWindowController, NSPopoverDelegate {
     }
   }()
 
+  var playlistView: PlaylistViewController {
+    return player.mainWindow.playlistView
+  }
+
   override var mouseActionDisabledViews: [NSView?] {[backgroundView, playlistWrapperView] as [NSView?]}
 
   // MARK: - Initialization
@@ -95,7 +99,7 @@ class MiniPlayerWindowController: PlayerWindowController, NSPopoverDelegate {
     // tracking area
     let trackingView = NSView()
     trackingView.translatesAutoresizingMaskIntoConstraints = false
-    window.contentView?.addSubview(trackingView, positioned: .above, relativeTo: nil)
+    window.contentView?.addSubview(trackingView, positioned: .below, relativeTo: nil)
     Utility.quickConstraints(["H:|[v]|"], ["v": trackingView])
     NSLayoutConstraint.activate([
       NSLayoutConstraint(item: trackingView, attribute: .bottom, relatedBy: .equal, toItem: backgroundView, attribute: .bottom, multiplier: 1, constant: 0),
@@ -171,17 +175,18 @@ class MiniPlayerWindowController: PlayerWindowController, NSPopoverDelegate {
       player.overrideAutoSwitchToMusicMode = false
       player.switchBackFromMiniPlayer(automatically: true, showMainWindow: false)
     }
-    player.mainWindow.close()
+    player.stop()
+    player.events.emit(.windowWillClose)
   }
 
   // MARK: - Window delegate: Size
-  func windowDidResize(_ notification: Notification) {
-    guard let window = window, !window.inLiveResize else { return }
-    videoView.videoLayer.draw()
+
+  func windowWillStartLiveResize(_ notification: Notification) {
+    videoView.videoLayer.inLiveResize = true
   }
 
   func windowDidEndLiveResize(_ notification: Notification) {
-    guard let window = window else { return }
+    guard player.info.state.active, let window = window else { return }
     let windowHeight = normalWindowHeight()
     if isPlaylistVisible {
       // hide
@@ -197,6 +202,7 @@ class MiniPlayerWindowController: PlayerWindowController, NSPopoverDelegate {
         isPlaylistVisible = true
       }
     }
+    videoView.videoLayer.inLiveResize = false
   }
 
   // MARK: - Window delegate: Activeness status
@@ -324,6 +330,17 @@ class MiniPlayerWindowController: PlayerWindowController, NSPopoverDelegate {
 
   // MARK: - IBActions
 
+  func showPlaylistAction(_ tab: PlaylistViewController.TabViewType) {
+    if !isPlaylistVisible {
+      playlistView.pleaseSwitchToTab(tab)
+      togglePlaylist(self)
+    } else if playlistView.currentTab == tab {
+      togglePlaylist(self)
+    } else {
+      playlistView.pleaseSwitchToTab(tab)
+    }
+  }
+
   @IBAction func togglePlaylist(_ sender: Any) {
     guard let window = window else { return }
     if isPlaylistVisible {
@@ -333,7 +350,7 @@ class MiniPlayerWindowController: PlayerWindowController, NSPopoverDelegate {
     } else {
       // show
       isPlaylistVisible = true
-      player.mainWindow.playlistView.reloadData(playlist: true, chapters: true)
+      playlistView.reloadData(playlist: true, chapters: true)
 
       var newFrame = window.frame
       newFrame.origin.y -= DefaultPlaylistHeight

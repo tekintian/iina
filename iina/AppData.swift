@@ -20,9 +20,12 @@ struct AppData {
   // Stopgap for https://github.com/mpv-player/mpv/issues/4000
   static let availableSpeedValues: [Double] = [0.03125, 0.0625, 0.125, 0.25, 0.5, 1, 2, 4, 8, 16, 32]
 
-  /** min/max speed for playback **/
+  // Min/max speed for playback speed slider in Quick Settings
   static let minSpeed = 0.25
   static let maxSpeed = 16.0
+
+  /// Lowest possible speed allowed by mpv (0.01x)
+  static let mpvMinPlaybackSpeed = 0.01
 
   /** generate aspect and crop options in menu */
   static let aspects: [String] = ["4:3", "5:4", "16:9", "16:10", "1:1", "3:2", "2.21:1", "2.35:1", "2.39:1"]
@@ -36,6 +39,7 @@ struct AppData {
   static let seekAmountMap = [0, 0.05, 0.1, 0.25, 0.5]
   static let seekAmountMapMouse = [0, 0.5, 1, 2, 4]
   static let volumeMap = [0, 0.25, 0.5, 0.75, 1]
+  static let playbackSpeedMap = [0, 0.001, 0.002, 0.005, 0.01]
 
   static let encodings = CharEncoding.list
 
@@ -63,6 +67,7 @@ struct AppData {
   static let algorithmHelpLink = "https://mpv.io/manual/stable/#options-tone-mapping"
   static let disableAnimationsHelpLink = "https://developer.apple.com/design/human-interface-guidelines/accessibility#Motion"
   static let gainAdjustmentHelpLink = "https://mpv.io/manual/stable/#options-replaygain"
+  static let gaplessAudioHelpLink = "https://mpv.io/manual/stable/#options-gapless-audio"
   static let audioDriverHellpLink = "https://mpv.io/manual/stable/#audio-output-drivers-coreaudio"
 
   static let widthWhenNoVideo = 640
@@ -106,6 +111,9 @@ struct Constants {
     static let showSubtitles = NSLocalizedString("menu.sub_show", comment: "Show Subtitles")
     static let hideSecondSubtitles = NSLocalizedString("menu.sub_second_hide", comment: "Hide Second Subtitles")
     static let showSecondSubtitles = NSLocalizedString("menu.sub_second_show", comment: "Show Second Subtitles")
+    static let managePlugins = NSLocalizedString("menu.manage_plugins", comment: "Manage Plugins…")
+    static let showPluginsPanel = NSLocalizedString("menu.show_plugins_panel", comment: "Show Plugins Panel")
+    static let hidePluginsPanel = NSLocalizedString("menu.hide_plugins_panel", comment: "Hide Plugins Panel")
   }
   struct Time {
     static let infinite = VideoTime(999, 0, 0)
