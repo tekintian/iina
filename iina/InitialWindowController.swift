@@ -244,7 +244,7 @@ class InitialWindowController: NSWindowController {
       "s3U-4u-gYp.title",
       "3aN-Hg-GkT.title",
       "I6R-Jl-2Jk.title",
-      "BIz-NQ-0qD.title"
+      "BIs-NQ-0qD.title"
     ].enumerated().map { (index, key) in
       let label = ui.label(key, wrapping: true, canCompress: false)
       label.size(width: width)
