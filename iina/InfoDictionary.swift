@@ -20,7 +20,7 @@ struct InfoDictionary {
   var buildConfiguration: String? { dictionary["\(buildKeyPrefix).configuration"] as? String }
   var buildCommit: String? { dictionary["\(buildKeyPrefix).commit"] as? String }
   var shortCommitSHA: String? {
-    guard let buildCommit = buildCommit else { return nil }
+    guard let buildCommit else { return nil }
     return String(buildCommit.prefix(7))
   }
 
@@ -49,7 +49,7 @@ struct InfoDictionary {
   ///
   /// This corresponds to the Xcode build configuration.
   var buildType: BuildType {
-    guard let buildConfiguration = buildConfiguration else { return .nightly }
+    guard let buildConfiguration else { return .nightly }
     return BuildType(rawValue: buildConfiguration) ?? .nightly
   }
 
@@ -76,14 +76,10 @@ struct InfoDictionary {
     } else {
       major = asFourChars.prefix(2)
     }
-    let minor: String.SubSequence
-    if asFourChars.last == "0" {
-      let index = asFourChars.index(asFourChars.endIndex, offsetBy: -2)
-      minor = asFourChars[index...index]
-    } else {
-      minor = asFourChars.suffix(2)
-    }
-    return "\(major).\(minor)"
+    let minor = asFourChars[asFourChars.index(asFourChars.endIndex, offsetBy: -2)]
+    let patch = asFourChars[asFourChars.index(asFourChars.endIndex, offsetBy: -1)]
+    guard patch != "0" else { return "\(major).\(minor)" }
+    return "\(major).\(minor).\(patch)"
   }
 
   var bundleIdentifier: String { dictionary["CFBundleIdentifier"] as! String }

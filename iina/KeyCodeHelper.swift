@@ -152,6 +152,7 @@ class KeyCodeHelper {
       "DOWN": NSDownArrowFunctionKey,
       "BS": NSBackspaceCharacter,
       "KP_DEL": NSDeleteCharacter,
+      "TAB": NSTabCharacter,
       "DEL": NSDeleteCharacter,
       "KP_INS": NSInsertFunctionKey,
       "INS": NSInsertFunctionKey,
@@ -241,7 +242,7 @@ class KeyCodeHelper {
   private static var lowerToUpperKeyMap: [String: String] = keyMap.reduce([:]) { partial, keyValuePair in
     var partial = partial
     let (upper, lower): (String, String?) = keyValuePair.value
-    if let lower = lower {
+    if let lower {
       partial[upper] = lower
     }
     return partial

@@ -41,7 +41,7 @@ class Utility {
   // MARK: - Logs, alerts
   static func showAlert(_ key: String, comment: String? = nil, arguments: [CVarArg]? = nil, style: NSAlert.Style = .critical, sheetWindow: NSWindow? = nil, suppressionKey: PK? = nil, disableMenus: Bool = false) {
     let alert = NSAlert()
-    if let suppressionKey = suppressionKey {
+    if let suppressionKey {
       // This alert includes a suppression button that allows the user to suppress the alert.
       // Do not show the alert if it has been suppressed.
       guard !Preference.bool(for: suppressionKey) else { return }
@@ -81,7 +81,7 @@ class Utility {
     if disableMenus {
       AppDelegate.shared.menuController.disableAllMenus()
     }
-    if let sheetWindow = sheetWindow {
+    if let sheetWindow {
       alert.beginSheetModal(for: sheetWindow)
     } else {
       alert.runModal()
@@ -128,7 +128,7 @@ class Utility {
     panel.addButton(withTitle: NSLocalizedString("general.ok", comment: "OK"))
     panel.addButton(withTitle: NSLocalizedString("general.cancel", comment: "Cancel"))
 
-    if let sheetWindow = sheetWindow {
+    if let sheetWindow {
       panel.beginSheetModal(for: sheetWindow, completionHandler: callback)
       return false
     } else {
@@ -152,10 +152,10 @@ class Utility {
     panel.canChooseFiles = !chooseDir
     panel.canChooseDirectories = chooseDir
     panel.resolvesAliases = true
-    panel.allowedFileTypes = allowedFileTypes
+    panel.allowedContentTypes = allowedFileTypes?.compactMap { UTType(filenameExtension: $0) } ?? []
     panel.allowsMultipleSelection = false
     panel.level = .modalPanel
-    if let dir = dir {
+    if let dir {
       panel.directoryURL = dir
     }
     let handler: (NSApplication.ModalResponse) -> Void = { result in
@@ -163,7 +163,7 @@ class Utility {
         callback(url)
       }
     }
-    if let sheetWindow = sheetWindow {
+    if let sheetWindow {
       panel.beginSheetModal(for: sheetWindow, completionHandler: handler)
     } else {
       panel.begin(completionHandler: handler)
@@ -186,7 +186,7 @@ class Utility {
     panel.canChooseDirectories = canChooseDir
     panel.resolvesAliases = true
     panel.allowsMultipleSelection = true
-    if let dir = dir {
+    if let dir {
       panel.directoryURL = dir
     }
     panel.begin() { result in
@@ -204,7 +204,7 @@ class Utility {
     let panel = NSSavePanel()
     panel.title = title
     panel.canCreateDirectories = true
-    panel.allowedFileTypes = types
+    panel.allowedContentTypes = types?.compactMap { UTType(filenameExtension: $0) } ?? []
     if filename != nil {
       panel.nameFieldStringValue = filename!
     }
@@ -213,7 +213,7 @@ class Utility {
         callback(url)
       }
     }
-    if let sheetWindow = sheetWindow {
+    if let sheetWindow {
       panel.beginSheetModal(for: sheetWindow, completionHandler: handler)
     } else {
       panel.begin(completionHandler: handler)
@@ -248,10 +248,8 @@ class Utility {
     input.cell?.isScrollable = true
     input.isBezeled = true
     input.bezelStyle = .roundedBezel
-    if #available(macOS 11.0, *) {
-      input.controlSize = .large
-    }
-    if let inputValue = inputValue {
+    input.controlSize = .large
+    if let inputValue {
       input.stringValue = inputValue
     }
     let stackView = NSStackView(frame: NSRect(x: 0, y: 0, width: 240, height: 32))
@@ -266,7 +264,7 @@ class Utility {
 
     // validation
     var observer: NSObjectProtocol?
-    if let validator = validator {
+    if let validator {
       let label = NSTextField(labelWithString: "label")
       label.textColor = .secondaryLabelColor
       label.font = .systemFont(ofSize: NSFont.smallSystemFontSize)
@@ -298,19 +296,19 @@ class Utility {
     stackView.translatesAutoresizingMaskIntoConstraints = true
     panel.accessoryView = stackView
 
-    if let sheetWindow = sheetWindow {
+    if let sheetWindow {
       panel.beginSheetModal(for: sheetWindow) { response in
         if response == .alertFirstButtonReturn {
           callback(input.stringValue)
         }
-        if let observer = observer {
+        if let observer {
           NotificationCenter.default.removeObserver(observer)
         }
       }
     } else {
       if panel.runModal() == .alertFirstButtonReturn {
         callback(input.stringValue)
-        if let observer = observer {
+        if let observer {
           NotificationCenter.default.removeObserver(observer)
         }
         return true
@@ -358,7 +356,7 @@ class Utility {
     panel.addButton(withTitle: NSLocalizedString("general.ok", comment: "OK"))
     panel.addButton(withTitle: NSLocalizedString("general.cancel", comment: "Cancel"))
     panel.window.initialFirstResponder = input
-    if let sheetWindow = sheetWindow {
+    if let sheetWindow {
       panel.beginSheetModal(for: sheetWindow) { response in
         if response == .alertFirstButtonReturn {
           callback(input.stringValue, pwField.stringValue)
@@ -375,12 +373,21 @@ class Utility {
   /**
    Pop up a font picker panel.
    - parameters:
+     - sheetWindow: The window to attach as a sheet
      - callback: A closure accepting the font name.
    */
-  static func quickFontPickerWindow(callback: @escaping (String?) -> Void) {
-    let appDelegate = AppDelegate.shared
-    appDelegate.fontPicker.finishedPicking = callback
-    appDelegate.fontPicker.showWindow(self)
+  static func quickFontPickerWindow(selecting initialSelection: String?, sheetWindow: NSWindow? = nil, callback: @escaping (String?) -> Void) {
+    let fontPicker = AppDelegate.shared.fontPicker
+    let _ = fontPicker.window  // load if not loaded
+    if let initialSelection {
+      fontPicker.select(initialSelection)
+    }
+    fontPicker.finishedPicking = callback
+    if let sheetWindow {
+      sheetWindow.beginSheet(fontPicker.window!)
+    } else {
+      fontPicker.showWindow(self)
+    }
   }
 
   // MARK: - App functions
@@ -507,14 +514,27 @@ class Utility {
     }
   }
 
-  /// See `mp_get_playback_resume_config_filename` in mpv/configfiles.c
-  static func mpvWatchLaterMd5(_ filename: String) -> String {
-    // mp_is_url
-    // if(!Regex.mpvURL.matches(filename)) {
-      // ignore_path_in_watch_later_config
-    // }
-    // handle dvd:// and bd://
-    return filename.md5
+  /// Calculates and returns a MD5 sum for the given URL.
+  ///
+  /// The mpv [Watch Later](https://mpv.io/manual/stable/#watch-later) feature saves options and their values in a
+  /// file whose name is based on the MD5 sum of the media's URL. IINA calculates this MD5 sum in order to find and read the watch
+  /// later file created by `libmpv` to be able to display the saved playback progress. For this to work the MD5 sum calculated by
+  /// IINA _must_ match the sum calculated by mpv or IINA will not be able to find the file created by mpv. The mpv code of interest is
+  /// the function
+  /// [mp_get_playback_resume_config_filename](https://github.com/mpv-player/mpv/blob/f5d4d9b029affa4d5b7eb13b28d91a96e6a92280/player/configfiles.c#L213-L229).
+  /// The code of this method differs slightly due to the way IINA uses URLs.
+  ///
+  /// If the `ignorePath` parameter is `true` that means the user has enabled the mpv
+  /// [ignore-path-in-watch-later-config](https://mpv.io/manual/stable/#options-ignore-path-in-watch-later-config)
+  /// option and the MD5 sum should only use the filename and not the full path.
+  /// - Parameters:
+  ///   - url: URL of the media.
+  ///   - ignorePath: When `true`, only use the URL's filename when calculating the sum.
+  /// - Returns: The appropriate MD5 sum as a hexadecimal string.
+  static func mpvWatchLaterMd5(_ url: URL, _ ignorePath: Bool) -> String {
+    if ignorePath, url.scheme == nil || url.isFileURL { return url.lastPathComponent.md5 }
+    if url.isFileURL { return url.path.md5 }
+    return url.absoluteString.md5
   }
 
   static func playbackProgressFromWatchLater(_ mpvMd5: String) -> VideoTime? {
@@ -553,17 +573,12 @@ class Utility {
   }
 
   static func icon(for url: URL) -> NSImage {
-    if #available(macOS 11.0, *) {
-      if let uttype = UTType.types(tag: url.pathExtension, tagClass: .filenameExtension, conformingTo: nil).first {
-        return NSWorkspace.shared.icon(for: uttype)
-      } else {
-        return NSWorkspace.shared.icon(for: .data)
-      }
+    if let uttype = UTType.types(tag: url.pathExtension, tagClass: .filenameExtension, conformingTo: nil).first {
+      return NSWorkspace.shared.icon(for: uttype)
     } else {
-      return NSWorkspace.shared.icon(forFileType: url.pathExtension)
+      return NSWorkspace.shared.icon(for: .data)
     }
   }
-
 
   // MARK: - Util classes
 
@@ -628,7 +643,7 @@ class Utility {
         case .right:
           a.alignment = .right
         }
-        if let f = f {
+        if let f {
           NSFont.systemFont(ofSize: NSFont.systemFontSize)
           return [
             .font: f,

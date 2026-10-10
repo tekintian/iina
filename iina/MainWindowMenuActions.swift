@@ -11,23 +11,23 @@ import Cocoa
 extension MainWindowController {
 
   @objc func menuShowPlaylistPanel(_ sender: NSMenuItem) {
-    showPlaylistSidebar(tab: .playlist)
+    sidebars.show(tab: "playlist")
   }
 
   @objc func menuShowChaptersPanel(_ sender: NSMenuItem) {
-    showPlaylistSidebar(tab: .chapters)
+    sidebars.show(tab: "chapters")
   }
 
   @objc func menuShowVideoQuickSettings(_ sender: NSMenuItem) {
-    showSettingsSidebar(tab: .video)
+    sidebars.show(tab: "video")
   }
 
   @objc func menuShowAudioQuickSettings(_ sender: NSMenuItem) {
-    showSettingsSidebar(tab: .audio)
+    sidebars.show(tab: "audio")
   }
 
   @objc func menuShowSubQuickSettings(_ sender: NSMenuItem) {
-    showSettingsSidebar(tab: .sub)
+    sidebars.show(tab: "sub")
   }
 
   @objc func menuChangeWindowSize(_ sender: NSMenuItem) {
@@ -39,7 +39,7 @@ extension MainWindowController {
     //  10: smaller size
     //  11: bigger size
     let size = sender.tag
-    guard let window = window, !fsState.isFullscreen else { return }
+    guard let window, !fsState.isFullscreen else { return }
 
     let screenFrame = (window.screen ?? NSScreen.main!).visibleFrame
     let newFrame: NSRect
@@ -59,7 +59,7 @@ extension MainWindowController {
     case 10, 11:
       let newWidth = window.frame.width + scaleStep * (size == 10 ? -1 : 1)
       let newHeight = newWidth / (window.aspectRatio.width / window.aspectRatio.height)
-      newFrame = window.frame.centeredResize(to: NSSize(width: newWidth, height: newHeight).satisfyMinSizeWithSameAspectRatio(minSize))
+      newFrame = window.frame.centeredResize(to: NSSize(width: newWidth, height: newHeight).satisfyMinSizeWithSameAspectRatio(AppData.mainWindowMinSize))
     default:
       return
     }
@@ -69,6 +69,11 @@ extension MainWindowController {
 
   @objc func menuAlwaysOnTop(_ sender: AnyObject) {
     setWindowFloatingOnTop(!isOntop)
+  }
+
+  @objc func menuLockAspectRatio(_ sender: NSMenuItem) {
+    let unlock = Preference.bool(for: .unlockWindowAspectRatio)
+    Preference.set(!unlock, for: .unlockWindowAspectRatio)
   }
 
   @objc func menuTogglePIP(_ sender: NSMenuItem) {
@@ -97,8 +102,8 @@ extension MainWindowController {
         player.info.delogoFilter = nil
       }
     } else {
-      self.hideSideBar {
-        self.enterInteractiveMode(.freeSelecting)
+      self.sidebars.hideAllSideBars {
+        self.interactiveMode.enter(mode: .delogo)
       }
     }
   }

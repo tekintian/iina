@@ -28,11 +28,11 @@ fileprivate let no_str = "no"
 /// | debug | debug messages |
 /// | trace | very noisy debug messages |
 /// - Important: The mpv event system uses an event queue of limited size. If events are not read quickly enough the queue can
-///     overflow and silently discard events. Loss of events can trigger severe malfunctions. IINA's ability to include mpv log messages
-///     in the IINA log file relies up the mpv `MPV_EVENT_LOG_MESSAGE` event. There is a danger that mpv will emit log messages
-///     at a rate that exceeds IINA's ability to empty the event queue before it overflows. For this reason IINA intentionally limits the
-///     mpv log level to `warn`. If you change the lecel to debug a problem be aware that the event queue could overflow and drop
-///     events resulting in odd behavior.
+///     overflow resulting in events being dropped. Loss of events can trigger severe malfunctions. IINA's ability to include mpv log
+///     messages in the IINA log file relies up the mpv `MPV_EVENT_LOG_MESSAGE` event. There is a danger that mpv will emit log
+///     messages at a rate that exceeds IINA's ability to empty the event queue before it overflows. For this reason IINA intentionally
+///     limits the mpv log level to `warn`. If you change the level to debug a problem be aware that the event queue could overflow
+///     and drop events resulting in odd behavior.
 fileprivate let MPVLogLevel = "warn"
 fileprivate let logLevelMap: [String: Logger.Level] = ["fatal": .error,
                                                        "error": .error,
@@ -98,14 +98,15 @@ class MPVController: NSObject {
   /// [DispatchQueue](https://developer.apple.com/documentation/dispatch/dispatchqueue) for reading `mpv`
   /// events.
   /// - Important: The mpv event system uses an event queue of limited size. If events are not read quickly enough with
-  ///     `mpv_wait_event` the queue can overflow and silently discard events. IINA can recover from the loss of some types of
-  ///     mpv events, but certain mpv events are critical. If a critical event is silently discarded IINA will experience severe
+  ///     `mpv_wait_event` the queue can overflow resulting in events being dropped. IINA can recover from the loss of some
+  ///     types of mpv events, but certain mpv events are critical. If a critical event is discarded IINA will experience severe
   ///     malfunctions. For this reason this queue _must only_ be used for reading events. This also means processing of events
   ///     _must not be performed_ using this queue unless the work required can _always_ be accomplished _quickly_. Otherwise
   ///     processing _must be_ queued to another dispatch queue.
   /// - Important: To avoid using locking to prevent data races the convention is that processing involving data used by the UI is
   ///     never performed while running on this queue's thread and instead is queued for processing by the main thread .
-  lazy var queue = DispatchQueue(label: "com.colliderli.iina.controller", qos: .userInitiated)
+  private lazy var queue = DispatchQueue(label: "com.colliderli.iina.controller",
+                                         qos: .userInitiated)
 
   unowned let player: PlayerCore
 
@@ -120,6 +121,7 @@ class MPVController: NSObject {
     MPVProperty.trackList: MPV_FORMAT_NONE,
     MPVProperty.vf: MPV_FORMAT_NONE,
     MPVProperty.af: MPV_FORMAT_NONE,
+    MPVProperty.audioDeviceList: MPV_FORMAT_NONE,
     MPVOption.TrackSelection.vid: MPV_FORMAT_INT64,
     MPVOption.TrackSelection.aid: MPV_FORMAT_INT64,
     MPVOption.TrackSelection.sid: MPV_FORMAT_INT64,
@@ -178,7 +180,7 @@ class MPVController: NSObject {
   ///   - playerCore: The player this `MPVController` will be associated with.
   init(playerCore: PlayerCore) {
     self.player = playerCore
-    subsystem = Logger.makeSubsystem("mpv\(player.playerNumber)")
+    subsystem = Logger.makeSubsystem("mpv\(player.playerNumber)", ["building.columns"])
     super.init()
   }
 
@@ -196,8 +198,6 @@ class MPVController: NSObject {
   /// hardware decoding support on this Mac. This is not comprehensive. This method only covers the recent codecs whose support
   /// for hardware decoding varies among Macs. This merely reduces the dependence upon the FFmpeg fallback to software decoding
   /// feature in some cases.
-  /// - ToDo: **REMOVE** workaround for FFmpeg not supporting AV1 hardware decoding when upgrading to a FFmpeg version
-  ///         that supports it.
   private func adjustCodecWhiteList() {
     // Allow the user to override this behavior.
     guard !userOptionsContains(MPVOption.Video.hwdecCodecs) else {
@@ -226,17 +226,6 @@ class MPVController: NSObject {
       // any of them retain the codec in the option value.
       for codecType in codecTypes {
         if HardwareDecodeCapabilities.shared.isSupported(codecType) {
-          if codecType == kCMVideoCodecType_AV1 {
-            // WORKAROUND missing support for AV1 hardware decoding.
-            // This Mac supports AV1 hardware decoding, but the version of FFmpeg IINA is using does
-            // not. FFmpeg will try to use hardware decoding, which will fail. FFmpeg will then fall
-            // back to software decoding. When FFmpeg does this it logs the warning message "Error
-            // while decoding frame (hardware decoding)!" which is alarming to users. Prevent this
-            // by removing AV1 from the codecs whitelist.
-            needsAdjustment = true
-            log("FFmpeg does not support av1 hardware decoding")
-            continue codecLoop
-          }
           adjusted.append(codec)
           continue codecLoop
         }
@@ -253,10 +242,6 @@ class MPVController: NSObject {
   /// Determine if this Mac has an Apple Silicon chip.
   /// - Returns: `true` if running on a Mac with an Apple Silicon chip, `false` otherwise.
   private func runningOnAppleSilicon() -> Bool {
-    // Old versions of macOS do not support Apple Silicon.
-    if #unavailable(macOS 11.0) {
-      return false
-    }
     var sysinfo = utsname()
     let result = uname(&sysinfo)
     guard result == EXIT_SUCCESS else {
@@ -363,15 +348,14 @@ class MPVController: NSObject {
 
     setUserOption(PK.screenshotFormat, type: .other, forName: MPVOption.Screenshot.screenshotFormat,
                   verboseIfDefault: true) { key in
-      let v = Preference.integer(for: key)
-      let format = Preference.ScreenshotFormat(rawValue: v)
+      let format: Preference.ScreenshotFormat = Preference.enum(for: key)
       // Workaround for mpv issue  #15107, HDR screenshots are unimplemented (gpu/gpu-next).
       // If the screenshot format is set to JPEG XL then set the screenshot-sw option to yes. This
       // causes the screenshot to be rendered by software instead of the VO. If a HDR video is being
       // displayed in HDR then the resulting screenshot will be HDR.
       self.chkErr(self.setOptionFlag(MPVOption.Screenshot.screenshotSw, format == .jxl,
                                      verboseIfDefault: true))
-      return format?.string
+      return String(describing: format)
     }
 
     setUserOption(PK.screenshotTemplate, type: .string,
@@ -413,28 +397,39 @@ class MPVController: NSObject {
 
     setUserOption(PK.hardwareDecoder, type: .other, forName: MPVOption.Video.hwdec,
                   verboseIfDefault: true) { key in
-      let value = Preference.integer(for: key)
-      return Preference.HardwareDecoderOption(rawValue: value)?.mpvString ?? "auto"
+      return String(describing: Preference.enum(for: key) as Preference.HardwareDecoderOption)
     }
 
     setUserOption(PK.audioLanguage, type: .string, forName: MPVOption.TrackSelection.alang,
                   level: .verbose)
     setUserOption(PK.maxVolume, type: .int, forName: MPVOption.Audio.volumeMax, level: .verbose)
 
-    var spdif: [String] = []
-    if Preference.bool(for: PK.spdifAC3) { spdif.append("ac3") }
-    if Preference.bool(for: PK.spdifDTS){ spdif.append("dts") }
-    if Preference.bool(for: PK.spdifDTSHD) { spdif.append("dts-hd") }
-    chkErr(setOptionString(MPVOption.Audio.audioSpdif, spdif.joined(separator: ","),
-                           verboseIfDefault: true))
+    let spdifValue = { (key: Preference.Key) -> String in
+      var spdif: [String] = []
+      if Preference.bool(for: PK.spdifAC3) { spdif.append("ac3") }
+      if Preference.bool(for: PK.spdifDTS){ spdif.append("dts") }
+      if Preference.bool(for: PK.spdifDTSHD) { spdif.append("dts-hd") }
+      if Preference.bool(for: PK.spdifEAC3) { spdif.append("eac3") }
+      if Preference.bool(for: PK.spdifTRUEHD) { spdif.append("truehd") }
+      return spdif.joined(separator: ",")
+    }
+    setUserOption(PK.spdifAC3, type: .other, forName: MPVOption.Audio.audioSpdif,
+                  verboseIfDefault: true, transformer: spdifValue)
+    setUserOption(PK.spdifDTS, type: .other, forName: MPVOption.Audio.audioSpdif,
+                  verboseIfDefault: true, transformer: spdifValue)
+    setUserOption(PK.spdifDTSHD, type: .other, forName: MPVOption.Audio.audioSpdif,
+                  verboseIfDefault: true, transformer: spdifValue)
+    setUserOption(PK.spdifEAC3, type: .other, forName: MPVOption.Audio.audioSpdif,
+                  verboseIfDefault: true, transformer: spdifValue)
+    setUserOption(PK.spdifTRUEHD, type: .other, forName: MPVOption.Audio.audioSpdif,
+                  verboseIfDefault: true, transformer: spdifValue)
 
     setUserOption(PK.audioDevice, type: .string, forName: MPVOption.Audio.audioDevice,
                   verboseIfDefault: true)
 
     setUserOption(PK.replayGain, type: .other, forName: MPVOption.Audio.replaygain,
                   verboseIfDefault: true) { key in
-      let value = Preference.integer(for: key)
-      return Preference.ReplayGainOption(rawValue: value)?.mpvString ?? "no"
+      return String(describing: Preference.enum(for: key) as Preference.ReplayGainOption)
     }
     setUserOption(PK.replayGainPreamp, type: .float, forName: MPVOption.Audio.replaygainPreamp,
                   verboseIfDefault: true)
@@ -445,9 +440,21 @@ class MPVController: NSObject {
 
     setUserOption(PK.gaplessAudio, type: .other, forName: MPVOption.Audio.gaplessAudio,
                   verboseIfDefault: true) { key in
-      let value = Preference.integer(for: key)
-      return Preference.GaplessAudioOption(rawValue: value)?.mpvString ?? "weak"
+      return String(describing: Preference.enum(for: key) as Preference.GaplessAudioOption)
     }
+
+    // IINA builds FFmpeg with support for the SVT-AV1 encoder. This encoder is preferred over
+    // libaom for its better performance. Must set the mpv screenshot-avif-encoder option as it
+    // defaults to "libaom-av1".
+    chkErr(setOptionString(MPVOption.Screenshot.screenshotAvifEncoder, "libsvtav1",
+                           level: .verbose))
+
+    // The mpv screenshot-avif-opts option default value uses keys recognized by the libaom encoder.
+    // As IINA is using the SVT-AV1 encoder the default value is inappropriate. Since the encoder is
+    // only being used for screenshots, enable still-picture coding optimizations for improved
+    // coding efficiency and reduced memory usage.
+    chkErr(setOptionString(MPVOption.Screenshot.screenshotAvifOpts, "svtav1-params=avif=1",
+                           level: .verbose))
 
     // - Sub
 
@@ -457,7 +464,7 @@ class MPVController: NSObject {
     player.info.subEncoding = Preference.string(for: .defaultEncoding)
 
     let subOverrideHandler: OptionObserverInfo.Transformer = { key in
-      (Preference.enum(for: key) as Preference.SubOverrideLevel).string
+      String(describing: Preference.enum(for: key) as Preference.SubOverrideLevel)
     }
     setUserOption(PK.subOverrideLevel, type: .other, forName: MPVOption.Subtitles.subAssOverride,
                   verboseIfDefault: true, transformer: subOverrideHandler)
@@ -472,8 +479,6 @@ class MPVController: NSObject {
 
     setUserOption(PK.subTextColorString, type: .color, forName: MPVOption.Subtitles.subColor,
                   verboseIfDefault: true)
-    setUserOption(PK.subBgColorString, type: .color, forName: MPVOption.Subtitles.subBackColor,
-                  verboseIfDefault: true)
 
     setUserOption(PK.subBold, type: .bool, forName: MPVOption.Subtitles.subBold,
                   verboseIfDefault: true)
@@ -485,26 +490,29 @@ class MPVController: NSObject {
     setUserOption(PK.subSpacing, type: .float, forName: MPVOption.Subtitles.subSpacing,
                   verboseIfDefault: true)
 
-    setUserOption(PK.subBorderSize, type: .float, forName: MPVOption.Subtitles.subBorderSize,
+    setUserOption(PK.subBorderSize, type: .float, forName: MPVOption.Subtitles.subOutlineSize,
                   verboseIfDefault: true)
-    setUserOption(PK.subBorderColorString, type: .color, forName: MPVOption.Subtitles.subBorderColor,
+    setUserOption(PK.subBorderColorString, type: .color, forName: MPVOption.Subtitles.subOutlineColor,
                   verboseIfDefault: true)
 
     setUserOption(PK.subShadowSize, type: .float, forName: MPVOption.Subtitles.subShadowOffset,
                   verboseIfDefault: true)
-    setUserOption(PK.subShadowColorString, type: .color, forName: MPVOption.Subtitles.subShadowColor,
+    setUserOption(PK.subShadowColorString, type: .color, forName: MPVOption.Subtitles.subBackColor,
                   verboseIfDefault: true)
+
+    setUserOption(PK.subBorderStyle, type: .other, forName: MPVOption.Subtitles.subBorderStyle,
+                  verboseIfDefault: true) { key in
+      String(describing: Preference.enum(for: key) as Preference.SubBorderStyle)
+    }
 
     setUserOption(PK.subAlignX, type: .other, forName: MPVOption.Subtitles.subAlignX,
                   verboseIfDefault: true) { key in
-      let v = Preference.integer(for: key)
-      return Preference.SubAlign(rawValue: v)?.stringForX
+      return String(describing: Preference.enum(for: key) as Preference.SubAlignX)
     }
 
     setUserOption(PK.subAlignY, type: .other, forName: MPVOption.Subtitles.subAlignY,
                   verboseIfDefault: true) { key in
-      let v = Preference.integer(for: key)
-      return Preference.SubAlign(rawValue: v)?.stringForY
+      return String(describing: Preference.enum(for: key) as Preference.SubAlignY)
     }
 
     setUserOption(PK.subMarginX, type: .int, forName: MPVOption.Subtitles.subMarginX,
@@ -528,9 +536,13 @@ class MPVController: NSObject {
 
     setUserOption(PK.enableCache, type: .other, forName: MPVOption.Cache.cache,
                   verboseIfDefault: true) { key in
-      return Preference.bool(for: key) ? nil : "no"
+      return Preference.bool(for: key) ? "yes" : "no"
     }
 
+    setUserOption(PK.cachePauseInitial, type: .bool, forName: MPVOption.Cache.cachePauseInitial,
+                  verboseIfDefault: true)
+    setUserOption(PK.cachePauseWait, type: .float, forName: MPVOption.Cache.cachePauseWait,
+                  verboseIfDefault: true)
     setUserOption(PK.defaultCacheSize, type: .other, forName: MPVOption.Demuxer.demuxerMaxBytes,
                   verboseIfDefault: true) { key in
       return "\(Preference.integer(for: key))KiB"
@@ -545,8 +557,8 @@ class MPVController: NSObject {
 
     setUserOption(PK.transportRTSPThrough, type: .other, forName: MPVOption.Network.rtspTransport,
                   verboseIfDefault: true) { key in
-      let v: Preference.RTSPTransportation = Preference.enum(for: .transportRTSPThrough)
-      return v.string
+      return String(describing: Preference.enum(for: .transportRTSPThrough) as
+                    Preference.RTSPTransportation)
     }
 
     setUserOption(PK.ytdlEnabled, type: .other, forName: MPVOption.ProgramBehavior.ytdl,
@@ -631,33 +643,8 @@ class MPVController: NSObject {
     chkErr(mpv_initialize(mpv))
 
     // The option watch-later-options is not available until after the mpv instance is initialized.
-    // Workaround for mpv issue #14417, watch-later-options missing secondary subtitle delay and sid.
-    // Allow the user to override this workaround by setting this mpv option in advanced settings.
-    if !userOptionsContains(MPVOption.WatchLater.watchLaterOptions),
-       var watchLaterOptions = getString(MPVOption.WatchLater.watchLaterOptions) {
-
-      // In mpv 0.38.0 the default value for the watch-later-options property contains the options
-      // sid and sub-delay, but not the corresponding options for the secondary subtitle. This
-      // inconsistency is likely to confuse users, so insure the secondary options are also saved in
-      // watch later files. Issue #14417 has been fixed, so this workaround will not be needed after
-      // the next mpv upgrade.
-      var needsUpdate = false
-      if watchLaterOptions.contains(MPVOption.TrackSelection.sid),
-         !watchLaterOptions.contains(MPVOption.Subtitles.secondarySid) {
-        log("Adding \(MPVOption.Subtitles.secondarySid) to \(MPVOption.WatchLater.watchLaterOptions)")
-        watchLaterOptions += "," + MPVOption.Subtitles.secondarySid
-        needsUpdate = true
-      }
-      if watchLaterOptions.contains(MPVOption.Subtitles.subDelay),
-         !watchLaterOptions.contains(MPVOption.Subtitles.secondarySubDelay) {
-        log("Adding \(MPVOption.Subtitles.secondarySubDelay) to \(MPVOption.WatchLater.watchLaterOptions)")
-        watchLaterOptions += "," + MPVOption.Subtitles.secondarySubDelay
-        needsUpdate = true
-      }
-      if needsUpdate {
-        chkErr(setOptionString(MPVOption.WatchLater.watchLaterOptions, watchLaterOptions, level: .verbose))
-      }
-    }
+    // Useful to log the value of this option as users often ask about what the Watch Later feature
+    // remembers.
     if let watchLaterOptions = getString(MPVOption.WatchLater.watchLaterOptions) {
       let sorted = watchLaterOptions.components(separatedBy: ",").sorted().joined(separator: ",")
       log("Options mpv is configured to save in watch later files: \(sorted)")
@@ -681,7 +668,7 @@ class MPVController: NSObject {
   /// - Note: Advanced control must be enabled for the screenshot command to work when the window flag is used. See issue
   ///         [#4822](https://github.com/iina/iina/issues/4822) for details.
   func mpvInitRendering() {
-    guard let mpv = mpv else {
+    guard let mpv else {
       fatalError("mpvInitRendering() should be called after mpv handle being initialized!")
     }
     let apiType = UnsafeMutableRawPointer(mutating: (MPV_RENDER_API_TYPE_OPENGL as NSString).utf8String)
@@ -725,7 +712,7 @@ class MPVController: NSObject {
   }
 
   func mpvUninitRendering() {
-    guard let mpvRenderContext = mpvRenderContext else { return }
+    guard let mpvRenderContext else { return }
     mpv_render_context_set_update_callback(mpvRenderContext, nil, nil)
     mpv_render_context_free(mpvRenderContext)
     self.mpvRenderContext = nil
@@ -734,12 +721,12 @@ class MPVController: NSObject {
   }
 
   func mpvReportSwap() {
-    guard let mpvRenderContext = mpvRenderContext else { return }
+    guard let mpvRenderContext else { return }
     mpv_render_context_report_swap(mpvRenderContext)
   }
 
   func shouldRenderUpdateFrame() -> Bool {
-    guard let mpvRenderContext = mpvRenderContext else { return false }
+    guard let mpvRenderContext else { return false }
     let flags: UInt64 = mpv_render_context_update(mpvRenderContext)
     return flags & UInt64(MPV_RENDER_UPDATE_FRAME.rawValue) > 0
   }
@@ -843,7 +830,7 @@ class MPVController: NSObject {
   // Set property
   func setFlag(_ name: String, _ flag: Bool, level: Logger.Level = .debug) {
     log("Set property: \(name)=\(flag)", level: level)
-    var data: Int = flag ? 1 : 0
+    var data: Int32 = flag ? 1 : 0
     mpv_set_property(mpv, name, MPV_FORMAT_FLAG, &data)
   }
 
@@ -862,6 +849,16 @@ class MPVController: NSObject {
   @discardableResult
   func setString(_ name: String, _ value: String, level: Logger.Level = .debug) -> Int32 {
     log("Set property: \(name)=\(value)", level: level)
+    return mpv_set_property_string(mpv, name, value)
+  }
+
+  @discardableResult
+  func setStringToDefault(_ name: String, level: Logger.Level = .debug) -> Int32 {
+    guard let value = MPVOptionDefaults.shared.getString(name) else {
+      log("Failed to obtain default for option: \(name)", level: .error)
+      return MPV_ERROR_OPTION_NOT_FOUND.rawValue
+    }
+    log("Set property to default: \(name)=\(value)", level: level)
     return mpv_set_property_string(mpv, name, value)
   }
 
@@ -885,7 +882,7 @@ class MPVController: NSObject {
   }
 
   func getFlag(_ name: String) -> Bool {
-    var data = Int64()
+    var data = Int32()
     mpv_get_property(mpv, name, MPV_FORMAT_FLAG, &data)
     return data > 0
   }
@@ -1045,6 +1042,18 @@ class MPVController: NSObject {
     MPVNode.free(node)
   }
 
+  /// Returns the given node map value as an `Int`.
+  ///
+  /// This method is intended to be used when extracting values from a `MPV_FORMAT_NODE_MAP` `mpv_node` that contains
+  /// mixed types.
+  /// - Note: Zero is returned for `nil` values to match the behavior of `getInt`.
+  /// - Parameter value:Value from a mpv node map.
+  /// - Returns: The given value converted to an `Int`.
+  static func nodeValueAsInt(_ value: Any?) -> Int {
+    guard let asInt64 = value as? Int64 else { return 0 }
+    return Int(asInt64)
+  }
+
   // MARK: - Hooks
 
   func addHook(_ name: MPVHook, priority: Int32 = 0, hook: MPVHookValue) {
@@ -1104,7 +1113,13 @@ class MPVController: NSObject {
       let userData = event.pointee.reply_userdata
       let hookEvent = event.pointee.data.bindMemory(to: mpv_event_hook.self, capacity: 1).pointee
       let hookID = hookEvent.id
-      guard let hook = $hooks.withLock({ $0[userData] }) else { break }
+      guard let hook = $hooks.withLock({ $0[userData] }) else {
+        // Hook not found, probably because it's from an unloaded plugin.
+        // Still need to call hook_continue otherwise it will stuck.
+        log("Hook \(hookID) not found", level: .warning)
+        mpv_hook_continue(self.mpv, hookID)
+        break
+      }
       hook.call {
         mpv_hook_continue(self.mpv, hookID)
       }
@@ -1145,10 +1160,10 @@ class MPVController: NSObject {
           recordedSeekStartTime = CACurrentMediaTime()
         }
         player.syncUI(.time)
-        let osdText = (player.info.videoPosition?.stringRepresentation ?? Constants.String.videoTimePlaceholder) + " / " +
-        (player.info.videoDuration?.stringRepresentation ?? Constants.String.videoTimePlaceholder)
+        let current = player.info.videoPosition?.stringRepresentation ?? Constants.String.videoTimePlaceholder
+        let total = player.info.videoDuration?.stringRepresentation ?? Constants.String.videoTimePlaceholder
         let percentage = (player.info.videoPosition / player.info.videoDuration) ?? 1
-        player.sendOSD(.seek(osdText, percentage))
+        player.sendOSD(.seek(current, total, percentage))
       }
 
     case MPV_EVENT_PLAYBACK_RESTART:
@@ -1182,6 +1197,9 @@ class MPVController: NSObject {
       // not leave this to the PlayerCore function and handle this now before calling fileEnded.
       if !dueToStopCommand, Preference.bool(for: .pauseWhenOpen) {
         setFlag(MPVOption.PlaybackControl.pause, true, level: .verbose)
+        // Normally a log message is emitted before calling mpv, but in this case, due to the race
+        // condition, playback must be paused as soon as possible, so logging is done afterward.
+        log("Pausing playback because \"pause when media is opened\" is enabled")
       }
       DispatchQueue.main.async { self.player.fileEnded(dueToStopCommand) }
 
@@ -1198,10 +1216,22 @@ class MPVController: NSObject {
           DispatchQueue.main.async {
             Utility.showAlert("screenshot.error_taking")
           }
-          return
+          break
         }
         DispatchQueue.main.async { self.player.screenshotCallback() }
       }
+
+    case MPV_EVENT_QUEUE_OVERFLOW:
+      // The mpv event system uses an event queue of limited size. If events are not read quickly
+      // enough the queue can overflow resulting in events being dropped. This event indicates the
+      // ringbuffer overflowed and at least one event was dropped. IINA can recover from the loss of
+      // some types of mpv events, but certain mpv events are critical. If a critical event is
+      // discarded IINA will experience severe malfunctions. For this reason most of the work of
+      // processing an event is dispatched to other queues so that MPVController can move on to
+      // reading the next event. This event indicates something went wrong and IINA failed to read
+      // events fast enough. As IINA has been ignoring this event we don't know if this has been
+      // occurring. For now log this as an error. May want to switch to an alert in the future.
+      log("Critical failure, mpv events lost, queue overflowed", level: .error)
 
     default: break
       // let eventName = String(cString: mpv_event_name(eventId))
@@ -1223,8 +1253,11 @@ class MPVController: NSObject {
 
     switch name {
 
+    case MPVProperty.audioDeviceList:
+      DispatchQueue.main.async { self.player.audioDeviceListChanged() }
+
     case MPVProperty.videoParams:
-      DispatchQueue.main.async { self.player.needReloadQuickSettingsView() }
+      DispatchQueue.main.async { self.player.postNotification(.iinaVideoParamsChanged) }
 
     case MPVProperty.videoParamsRotate:
       guard let rotation = UnsafePointer<Int>(OpaquePointer(property.data))?.pointee else {
@@ -1279,7 +1312,7 @@ class MPVController: NSObject {
         default:
           player.sendOSD(.noLoop)
         }
-        player.syncUI(.loop)
+        player.postNotification(.iinaLoopStatusChanged)
       }
 
     case MPVOption.Video.deinterlace:
@@ -1293,7 +1326,7 @@ class MPVController: NSObject {
           player.info.deinterlace = data
           player.sendOSD(.deinterlace(data))
         }
-        player.needReloadQuickSettingsView()
+        player.postNotification(.iinaDeinterlaceChanged)
       }
 
     case MPVOption.Video.hwdec:
@@ -1303,7 +1336,7 @@ class MPVController: NSObject {
           player.info.hwdec = data
           player.sendOSD(.hwdec(player.info.hwdecEnabled))
         }
-        player.needReloadQuickSettingsView()
+        player.postNotification(.iinaHwdecChanged)
       }
 
     case MPVOption.Video.videoRotate:
@@ -1320,8 +1353,8 @@ class MPVController: NSObject {
         break
       }
       DispatchQueue.main.async { [self] in
-        player.syncUI(.volume)
         player.info.isMuted = data
+        player.syncUI(.volume)
         player.sendOSD(data ? OSDMessage.mute : OSDMessage.unMute)
       }
 
@@ -1344,7 +1377,7 @@ class MPVController: NSObject {
       DispatchQueue.main.async { [self] in
         player.info.audioDelay = data
         player.sendOSD(.audioDelay(data))
-        player.needReloadQuickSettingsView()
+        player.postNotification(.iinaAudioDelayChanged)
       }
 
     case MPVOption.Subtitles.subVisibility:
@@ -1379,12 +1412,7 @@ class MPVController: NSObject {
         logPropertyValueError(MPVOption.Subtitles.subScale, property.format)
         break
       }
-      let displayValue = data >= 1 ? data : -1/data
-      let truncated = round(displayValue * 100) / 100
-      DispatchQueue.main.async { [self] in
-        player.sendOSD(.subScale(truncated))
-        player.needReloadQuickSettingsView()
-      }
+      DispatchQueue.main.async { self.player.subScaleChanged(data) }
 
     case MPVOption.Subtitles.secondarySubPos:
       fallthrough
@@ -1393,11 +1421,11 @@ class MPVController: NSObject {
         logPropertyValueError(name, property.format)
         break
       }
-      guard name == MPVOption.Subtitles.subPos else {
+      if name == MPVOption.Subtitles.subPos {
+        DispatchQueue.main.async { self.player.subPosChanged(data) }
+      } else {
         DispatchQueue.main.async { self.player.secondarySubPosChanged(data) }
-        break
       }
-      DispatchQueue.main.async { self.player.subPosChanged(data) }
 
     case MPVOption.Equalizer.contrast:
       guard let data = UnsafePointer<Int64>(OpaquePointer(property.data))?.pointee else {
@@ -1408,7 +1436,7 @@ class MPVController: NSObject {
       DispatchQueue.main.async { [self] in
         player.info.contrast = intData
         player.sendOSD(.contrast(intData))
-        player.needReloadQuickSettingsView()
+        player.postNotification(.iinaVideoEqualizerChanged)
       }
 
     case MPVOption.Equalizer.hue:
@@ -1420,7 +1448,7 @@ class MPVController: NSObject {
       DispatchQueue.main.async { [self] in
         player.info.hue = intData
         player.sendOSD(.hue(intData))
-        player.needReloadQuickSettingsView()
+        player.postNotification(.iinaVideoEqualizerChanged)
       }
 
     case MPVOption.Equalizer.brightness:
@@ -1432,7 +1460,7 @@ class MPVController: NSObject {
       DispatchQueue.main.async { [self] in
         player.info.brightness = intData
         player.sendOSD(.brightness(intData))
-        player.needReloadQuickSettingsView()
+        player.postNotification(.iinaVideoEqualizerChanged)
       }
 
     case MPVOption.Equalizer.gamma:
@@ -1444,7 +1472,7 @@ class MPVController: NSObject {
       DispatchQueue.main.async { [self] in
         player.info.gamma = intData
         player.sendOSD(.gamma(intData))
-        player.needReloadQuickSettingsView()
+        player.postNotification(.iinaVideoEqualizerChanged)
       }
 
     case MPVOption.Equalizer.saturation:
@@ -1456,7 +1484,7 @@ class MPVController: NSObject {
       DispatchQueue.main.async { [self] in
         player.info.saturation = intData
         player.sendOSD(.saturation(intData))
-        player.needReloadQuickSettingsView()
+        player.postNotification(.iinaVideoEqualizerChanged)
       }
 
     // following properties may change before file loaded
@@ -1470,7 +1498,6 @@ class MPVController: NSObject {
     case MPVProperty.vf:
       DispatchQueue.main.async { [self] in
         player.vfChanged()
-        player.needReloadQuickSettingsView()
       }
 
     case MPVProperty.af:
@@ -1530,7 +1557,6 @@ class MPVController: NSObject {
   }
 
   // MARK: - User Options
-
 
   private enum UserOptionType {
     case bool, int, float, string, color, other
@@ -1596,7 +1622,7 @@ class MPVController: NSObject {
   private func setOptionalOptionColor(_ name: String, _ value: String?,
                                        level: Logger.Level = .debug,
                                        verboseIfDefault: Bool = false) -> Int32 {
-    guard let value = value else { return 0 }
+    guard let value else { return 0 }
     let levelToUse: Logger.Level = {
       // The default value for options of type color is currently returned by mpv in the alternative
       // string format that specifies component values in hex. Must convert to the form that uses
@@ -1612,7 +1638,7 @@ class MPVController: NSObject {
 
   private func setOptionalOptionString(_ name: String, _ value: String?, level: Logger.Level = .debug,
                                        verboseIfDefault: Bool = false) -> Int32 {
-    guard let value = value else { return 0 }
+    guard let value else { return 0 }
     return setOptionString(name, value, level: level, verboseIfDefault: verboseIfDefault)
   }
 
@@ -1693,7 +1719,7 @@ class MPVController: NSObject {
   override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
     guard !(change?[NSKeyValueChangeKey.oldKey] is NSNull) else { return }
 
-    guard let keyPath = keyPath else { return }
+    guard let keyPath else { return }
     guard let infos = optionObservers[keyPath] else { return }
 
     for info in infos {

@@ -37,7 +37,7 @@ class PrefOSCToolbarDraggingItemViewController: NSViewController, NSPasteboardWr
     // Button is actually disabled so that its mouseDown goes to its superview instead. But don't gray it out.
     (toolbarButton.cell! as! NSButtonCell).imageDimsWhenDisabled = false
 
-    descriptionLabel.stringValue = buttonType.description()
+    descriptionLabel.stringValue = buttonType.localizedDescription()
   }
 
   func writableTypes(for pasteboard: NSPasteboard) -> [NSPasteboard.PasteboardType] {
@@ -52,7 +52,7 @@ class PrefOSCToolbarDraggingItemViewController: NSViewController, NSPasteboardWr
   }
 
   override func mouseDown(with event: NSEvent) {
-    guard let availableItemsView = availableItemsView else { return }
+    guard let availableItemsView else { return }
 
     guard let dragItem = OSCToolbarButton.buildDragItem(from: toolbarButton, pasteboardWriter: self, buttonType: buttonType) else { return }
     view.beginDraggingSession(with: [dragItem], event: event, source: availableItemsView)

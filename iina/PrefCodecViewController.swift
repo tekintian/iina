@@ -20,7 +20,7 @@ class PrefCodecViewController: PreferenceViewController, PreferenceWindowEmbedda
   }
 
   var preferenceTabImage: NSImage {
-    return makeSymbol("play.rectangle.on.rectangle", fallbackImage: "pref_av")
+    return .sf("play.rectangle.on.rectangle", "photo.tv", withConfiguration: symbolConfiguration)!
   }
 
   override var sectionViews: [NSView] {
@@ -58,10 +58,7 @@ class PrefCodecViewController: PreferenceViewController, PreferenceWindowEmbedda
   override func viewWillAppear() {
     super.viewWillAppear()
     
-    if #available(macOS 14.0, *) {
-      audioDriverExperimentalIndicator.image = NSImage.findSFSymbol(["flask.fill"])
-    }
-
+    audioDriverExperimentalIndicator.image = NSImage.sf("flask.fill")
     updateAudioDevicePopUp()
 
     // The list of audio devices changes based on the audio driver setting.
@@ -201,22 +198,22 @@ class PrefCodecViewController: PreferenceViewController, PreferenceWindowEmbedda
   }
 
   @IBAction func targetPeakHelpAction(_ sender: Any) {
-    NSWorkspace.shared.open(URL(string: AppData.targetPeakHelpLink)!)
+    NSWorkspace.shared.open(URL(string: AppData.mpvManualLink.appending("/#options-target-peak"))!)
   }
 
   @IBAction func algorithmHelpAction(_ sender: Any) {
-    NSWorkspace.shared.open(URL(string: AppData.algorithmHelpLink)!)
+    NSWorkspace.shared.open(URL(string: AppData.mpvManualLink.appending("/#options-tone-mapping"))!)
   }
 
   @IBAction func gainAdjustmentHelpAction(_ sender: Any) {
-    NSWorkspace.shared.open(URL(string: AppData.gainAdjustmentHelpLink)!)
+    NSWorkspace.shared.open(URL(string: AppData.mpvManualLink.appending("/#options-replaygain"))!)
   }
 
   @IBAction func gaplessAudioHelpAction(_ sender: Any) {
-    NSWorkspace.shared.open(URL(string: AppData.gaplessAudioHelpLink)!)
+    NSWorkspace.shared.open(URL(string: AppData.mpvManualLink.appending("/#options-gapless-audio"))!)
   }
 
   @IBAction func audioDriverHelpAction(_ sender: Any) {
-    NSWorkspace.shared.open(URL(string: AppData.audioDriverHellpLink)!)
+    NSWorkspace.shared.open(URL(string: AppData.mpvManualLink.appending("/#audio-output-drivers-coreaudio"))!)
   }
 }

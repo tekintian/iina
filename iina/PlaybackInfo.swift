@@ -49,11 +49,11 @@ class PlaybackInfo {
       // Block inappropriate state changes.
       guard oldValue != .loading || state != .idle, oldValue != .stopping || state == .idle,
             oldValue != .shuttingDown || state == .shutDown, oldValue != .shutDown else {
-        player.log("Blocked attempt to change state from \(oldValue) to \(state)", level: .verbose)
+        player.log("Blocked attempt to change state from \(oldValue) to \(state)", level: .error)
         state = oldValue
         return
       }
-      player.log("State changed from \(oldValue) to \(state)", level: .verbose)
+      player.log("State changed from \(oldValue) to \(state)")
       switch state {
       case .idle:
         SleepPreventer.updateSleepPrevention()
@@ -83,11 +83,8 @@ class PlaybackInfo {
 
   var currentURL: URL? {
     didSet {
-      if let url = currentURL {
-        mpvMd5 = Utility.mpvWatchLaterMd5(url.path)
-      } else {
-        mpvMd5 = nil
-      }
+      guard currentURL == nil else { return }
+      mpvMd5 = nil
     }
   }
   var isNetworkResource: Bool = false
@@ -103,6 +100,11 @@ class PlaybackInfo {
 
   var videoPosition: VideoTime?
   var videoDuration: VideoTime?
+
+  var progress: Double {
+    guard let progress = videoPosition / videoDuration else { return 0 }
+    return progress
+  }
 
   /// Remaining playback time.
   ///
@@ -125,8 +127,8 @@ class PlaybackInfo {
     if noVideoTrack && noAudioTrack {
       return .unknown
     }
-    let allVideoTracksAreAlbumCover = !videoTracks.contains { !$0.isAlbumart }
-    return (noVideoTrack || allVideoTracksAreAlbumCover) ? .isAudio : .notAudio
+    let hasRealVideoTrack = videoTracks.contains { !$0.isAlbumart }
+    return (noVideoTrack || !hasRealVideoTrack) ? .isAudio : .notAudio
   }
 
   var justStartedFile: Bool = false
@@ -225,7 +227,7 @@ class PlaybackInfo {
       id = secondSid
       list = subTracks
     }
-    if let id = id {
+    if let id {
       return list.first { $0.id == id }
     } else {
       return nil
@@ -238,11 +240,17 @@ class PlaybackInfo {
   ///     To avoid the need to lock multiple locks the cache properties are always accessed while holding the playlist lock. The cache
   ///     properties are private to force all access to be through class methods that properly coordinate thread access.
   @Atomic var playlist: [MPVPlaylistItem] = []
+
+  var isShuffled = false
   private var cachedVideoDurationAndProgress: [String: (duration: Double?, progress: Double?)] = [:]
   private var cachedMetadata: [String: (title: String?, album: String?, artist: String?)] = [:]
 
   var chapters: [MPVChapter] = []
   var chapter = 0
+
+  func getChapter(forVideoTime time: VideoTime) -> MPVChapter? {
+    return chapters.last(where: { $0.time <= time })
+  }
 
   @Atomic var matchedSubs: [String: [URL]] = [:]
 
